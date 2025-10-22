@@ -2,7 +2,7 @@ Campus music
 
 # 
 
-**Esteban Mantilla**
+**Esteban Mantilla y Alexi Duran**
 
 **S2**
 
@@ -72,7 +72,13 @@ Tabla de Contenidos
 
 # Introducción {#introducción}
 
-Este documento presenta el diseño de una base de datos relacional destinada a gestionar información sobre una tienda de anime. El objetivo principal es establecer una base de datos centralizada, confiable y eficiente. El diseño se basa en un archivo JSON proporcionado como fuente de datos primaria.
+El presente documento ha sido elaborado con el propósito de mostrar el diseño del sistema de información para la gestión, análisis y consulta de datos de las escuelas de musica de la empresa Campus music, basado en la información suministrada.
+Este trabajo se desarrolla por medio Esteban Mantila y Alexi Durán Gómez, con el fin de aplicar los conocimientos adquiridos en el diseño, modelado y estructuración de bases de datos, utilizando MongoDB como sistema gestor de base de datos NoSQL referenciado.
+La documentación presenta de manera ordenada el proceso completo de diseño del sistema, abarcando desde la conceptualización inicial del modelo de datos hasta su implementación física en MongoDB. Se incluyen las etapas de planificación, diseño conceptual, modelo lógico, normalización y definición de las colecciones, así como ejemplos de inserción y consultas de información.
+El sistema busca ofrecer una estructura sólida y escalable que permita almacenar, organizar y consultar información sobre las escuelas de musica, facilitando su análisis por sede, curso, Zona, roles etc...
+El uso de MongoDB como tecnología base responde a la necesidad de manejar grandes volúmenes de datos estructurados y semiestructurados de forma flexible, permitiendo almacenar documentos con distintos niveles de detalle y adaptarse a la naturaleza heterogénea de los registros educativos.
+Este enfoque proporciona una visión moderna y eficiente para la administración de datos educativos, favoreciendo su integración con aplicaciones web y sistemas de análisis en tiempo real.
+
 
 # 
 
@@ -80,9 +86,47 @@ Este documento presenta el diseño de una base de datos relacional destinada a g
 
 # Caso de Estudio {#caso-de-estudio}
 
-Este caso de estudio presenta un sistema de informacion destinado a gestionar información sobre una tienda de anime. El objetivo principal es establecer un repositorio centralizado, confiable y eficiente . El diseño se basa en un archivo JSON proporcionado como fuente de datos primaria.
+**Campus Music** es una empresa que administra múltiples escuelas de música en diferentes ciudades.
+
+Actualmente, usan hojas de cálculo para registrar estudiantes, profesores, cursos e inscripciones, lo que causa duplicación de datos y errores.
+
+Han decidido migrar a **MongoDB** para mejorar la flexibilidad, manejar la información de manera unificada, y soportar operaciones transaccionales en inscripciones. Tu rol será diseñar esta solución, poblarla con datos realistas, implementar consultas analíticas, definir roles de seguridad y demostrar el uso de transacciones.
+
+
+
+## Requisitos funcionales del sistema
+
+### Funcionalidad esperada
+
+El sistema debe permitir:
+
+- Registro de **estudiantes** (nombre, documento, contacto, nivel musical).
+- Registro de **profesores** (especialidad, experiencia, cursos asignados).
+- Registro de **cursos** (instrumento, nivel, duración, cupos, horario).
+- Registro de **sedes** (ciudad, dirección, capacidad, cursos disponibles).
+- Gestión de **usuarios** con roles:
+- **Administrador**: acceso total.
+- **Empleado de sede**: acceso limitado a la sede.
+- **Estudiante**: acceso a su información, inscripción y consulta de cursos disponibles.
+- **Inscripción de estudiantes** en cursos:
+- Validar cupos disponibles.
+- tener en cuenta costo y fechaInscripcion.
+- Asociar estudiante con curso, sede y profesor.
+- Actualizar cupo automáticamente mediante transacción.
+- **Reservas de instrumentos** por parte de estudiantes (ej: piano, guitarra, violín).
+- Reportes y consultas analíticas:
+- Ocupación de cursos por sede.
+- Cursos más demandados.
+- Profesores con más estudiantes asignados.
+- Instrumentos más reservados.
+- Histórico de cursos tomados por cada estudiante.
 
 # Planificación {#planificación}
+Esté modelo de Base de datos busca estar bien estructurado y seguir con coherencia el enfoque relacional dentro de MongoDB, también conocido como modelo referenciado híbrido, que busca mantener integridad y consistencia usando referencias entre colecciones  en lugar de anidar demasiados documentos, ya que esto evita la duplicidad y mantiene el control sobre la estructura (ideal ya que conocemos que se poseen esos errores en el sistema de informacion anterior).
+
+Entonces se sigue la filosofía SQL aplicada a MongoDB y su sistema NoSQL, conservando el diseño relacional con entidades independientes y relaciones 1:N o N:M por referencia.
+Basado en los diagramas que se crearon para graficar el diseño y el dataset.
+
 
 ## Construcción del Modelo Conceptual {#construcción-del-modelo-conceptual}
 
