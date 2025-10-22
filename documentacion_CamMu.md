@@ -68,7 +68,6 @@ Tabla de Contenidos
 
 [**Referencias	13**](#referencias)
 
-# 
 
 # Introducción {#introducción}
 
@@ -79,10 +78,6 @@ El sistema busca ofrecer una estructura sólida y escalable que permita almacena
 El uso de MongoDB como tecnología base responde a la necesidad de manejar grandes volúmenes de datos estructurados y semiestructurados de forma flexible, permitiendo almacenar documentos con distintos niveles de detalle y adaptarse a la naturaleza heterogénea de los registros educativos.
 Este enfoque proporciona una visión moderna y eficiente para la administración de datos educativos, favoreciendo su integración con aplicaciones web y sistemas de análisis en tiempo real.
 
-
-# 
-
-# 
 
 # Caso de Estudio {#caso-de-estudio}
 
