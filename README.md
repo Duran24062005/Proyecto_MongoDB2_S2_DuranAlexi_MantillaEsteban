@@ -20,7 +20,7 @@ erDiagram
     SEDES ||--o{ INSTRUMENTOS : "posee"
 
 ```
-
+![Node](./img/DBDiagramsProyectoMongoDB2_S2_DuranAlexi_MantillaEsteban.jpg)
 
 - [Requerimientos](./ProyectoMongoDB2.md)
 
