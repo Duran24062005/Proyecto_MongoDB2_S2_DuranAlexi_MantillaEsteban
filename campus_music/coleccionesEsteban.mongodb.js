@@ -30,7 +30,7 @@ db.createCollection("Profesores",{
                 _id:{bsonType:"int"},
                 nombre_pro:{bsonType:"string"},
                 especialidad:{bsonType:"string"},
-                cursos_asignados:{bsonType:"object"},
+                cursos_asignados:{bsonType:"array"},
                 esperiencia:{bsonType:"string"},
                 id_sede:{bsonType:"int"}
             }
@@ -61,4 +61,75 @@ db.createCollection("Cursos",{
         }
     }
 });
+
+// coleccion curso_profesor
+db.createCollection("Curso_profesor",{
+    validator:{
+        $jsonSchema:{
+            bsonType:"object",
+            required:["_id","id_curso","id_profesor","id_sede"],
+            properties:{
+                _id:{bsonType:"int"},
+                id_curso:{bsonType:"int"},
+                id_sede:{bsonType:"int"}
+            }
+        }
+    }
+});
+
+// coleccion Resevas_instrumento
+db.createCollection("Reservas_instrumento",{
+    validator:{
+        $jsonSchema:{
+            bsonType:"object",
+            required:["_id","id_instrumento","id_estudiante","fecha_rese","fecha_finrese"],
+            properties:{
+                _id:{bsonType:"int"},
+                id_instumento:{bsonType:"int"},
+                id_estudiante:{bsonType:"int"},
+                fecha_rese:{bsonType:"date"},
+                fecha_finrese:{bsonType:"date"}
+            }
+        }
+    }
+});
+
+// indices
+
+
+// indice por sede
+db.Estudiantes.createIndex({ id_sede: 1 });
+
+// indice por sede 
+db.Profesores.createIndex({ id_sede: 1 });
+
+// indice por cursos asignados 
+db.Profesores.createIndex({ cursos_asignados: 1 });
+
+// indice por sede
+db.Cursos.createIndex({ id_sede: 1 });
+
+// indice por nombre_curso 
+db.Cursos.createIndex({ nombre_curso: 1 });
+
+// indice por nivel para consultas por nivel
+db.Cursos.createIndex({ nivel: 1 });
+
+// indice combinado para cupos 
+db.Cursos.createIndex({ _id: 1, cupos: 1 });
+
+// indice cursos con profesores
+db.Curso_profesor.createIndex({ id_curso: 1, id_profesor: 1 });
+
+// indice por sede 
+db.Curso_profesor.createIndex({ id_sede: 1 });
+
+// indice de instrumento 
+db.Reservas_instrumento.createIndex({ id_instrumento: 1 });
+
+// indice por estudiante 
+db.Reservas_instrumento.createIndex({ id_estudiante: 1 });
+
+// indice de fechas
+db.Reservas_instrumento.createIndex({ fecha_rese: -1, fecha_finrese: -1 });
 
