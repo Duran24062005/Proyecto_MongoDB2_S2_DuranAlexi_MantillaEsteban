@@ -103,6 +103,7 @@ db.createCollection('Usuarios', {
             bsonType: 'object',
             required: ['tipo_usuario', 'descripcion'],
             properties: {
+                _id:{bsonType:"int"},
                 tipo_usuario: { bsonType: 'string' },
                 descripcion: { bsonType: 'string' }
             }
@@ -117,6 +118,7 @@ db.createCollection('Instrumentos', {
             bsonType: 'object',
             required: ['nombre_instrumento', 'id_Sede', 'disponibilidad'],
             properties: {
+                _id:{bsonType:"int"},
                 nombre_instrumento: {bsonType: 'string'},
                 id_sede: {bsonType: 'int'},
                 disponibilidad: {bsonType: 'bool'}
@@ -132,6 +134,7 @@ db.createCollection('Inscripciones', {
             bsonType: 'object',
             required: ['id_estudiante', 'id_curso', 'id_sede'],
             properties: {
+                _id:{bsonType:"int"},
                 id_estudiante: {bsonType: 'int'},
                 id_curso: {bsonType: 'int'},
                 id_sede: {bsonType: 'int'}
@@ -147,6 +150,7 @@ db.createCollection('Sedes', {
             bsonType: 'object',
             required: ['ciudad', 'direccion', 'capacidad', 'n_estudiantes', 'cursos_disponibles'],
             properties: {
+                _id:{bsonType:"int"},
                 ciudad: {bsonType: 'string'},
                 direccion: {bsonType: 'string'},
                 capacidad: {bsonType: 'int'},
