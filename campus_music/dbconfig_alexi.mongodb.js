@@ -46,7 +46,7 @@ db.createCollection("Cursos",{
     validator:{
         $jsonSchema:{
             bsonType:"object",
-            required:["_id","nombre_curso","horario","cupos","duracion","nivel","id_instumento"],
+            required:["_id","nombre_curso","horario","cupos","duracion","nivel","id_instrumento"],
             properties:{
                 _id:{bsonType:"int"},
                 nombre_curso:{bsonType:"string"},
@@ -87,7 +87,7 @@ db.createCollection("Reservas_instrumento",{
             required:["_id","id_instrumento","id_estudiante","fecha_rese","fecha_finrese"],
             properties:{
                 _id:{bsonType:"int"},
-                id_instumento:{bsonType:"int"},
+                id_instrumento:{bsonType:"int"},
                 id_estudiante:{bsonType:"int"},
                 fecha_rese:{bsonType:"date"},
                 fecha_finrese:{bsonType:"date"}
@@ -101,7 +101,7 @@ db.createCollection('Usuarios', {
     validator: {
         $jsonSchema: {
             bsonType: 'object',
-            required: ['tipo_usuario', 'descripción'],
+            required: ['tipo_usuario', 'descripcion'],
             properties: {
                 tipo_usuario: { bsonType: 'string' },
                 descripcion: { bsonType: 'string' }
@@ -145,10 +145,10 @@ db.createCollection('Sedes', {
     validator: {
         $jsonSchema: {
             bsonType: 'object',
-            required: ['ciudad', 'dirección', 'capacidad', 'n_estudiantes', 'cursos_diosponibles'],
+            required: ['ciudad', 'direccion', 'capacidad', 'n_estudiantes', 'cursos_disponibles'],
             properties: {
                 ciudad: {bsonType: 'string'},
-                direccionm: {bsonType: 'string'},
+                direccion: {bsonType: 'string'},
                 capacidad: {bsonType: 'int'},
                 n_estudiantes: {bsonType: 'int'},
                 cursos_disponibles: {bsonType: 'int'}
@@ -160,8 +160,6 @@ db.createCollection('Sedes', {
 
 // creación de indices
 
-// indice por sede
-db.Estudiantes.createIndex({ id_sede: 1 });
 
 // indice por sede 
 db.Profesores.createIndex({ id_sede: 1 });
@@ -205,15 +203,9 @@ db.Instrumentos.createIndex({ disponibilidad: 1 });
 
 
 // Inscriptions Collection
-db.Inscripciones.createIndex({ id_sede: 1, fecha_inscripcion: -1 });
+db.Inscripciones.createIndex({ id_sede: 1});
 db.Inscripciones.createIndex({ id_sede: 1, id_curso: 1 });
 db.Inscripciones.createIndex({ id_estudiante: 1 });
-
-// Colección Cursos
-db.Cursos.createIndex({ id_profesor: 1 });
-db.Cursos.createIndex({ id_curso: 1 });
-db.Cursos.createIndex({ fecha_inicio: 1, fecha_fin: 1 });
-db.Cursos.createIndex({ n_estudiantes: 1, cupo_maximo: 1 });
 
 
 // Colección Reservas
