@@ -129,13 +129,15 @@ Un modelo conceptual es una representación de un sistema, hecho de la composici
 
 ### Descripción {#descripción}
 
-Modelo de entidad relacion donde se relaciona entidades importantes como , el anime , el nombre de la fgura, el proveedor.
+Modelo de entidad relacion donde se relaciona entidades importantes como , el Estudiante , el nivel, el curso.
 
 ### Gráfica {#gráfica}
 
+![modelo conceptual](./img/DBDiagramsProyectoMongoDB2_S2_DuranAlexi_MantillaEsteban.jpg)
+
 ### Descripción Técnica {#descripción-técnica}
 
-El modelo conceptual establece las siguientes relaciones entre entidades, de acuerdo con el diagrama proporcionado: ● DEPARTAMENTO – MUNICIPIO (1:N): Un departamento puede contener múltiples municipios, mientras que cada municipio pertenece a un único departamento. ● MUNICIPIO – SEDE (1:N): Cada municipio está asociado a una única sede, representada por coordenadas específicas. ● SEDE – ESTUDIANTES (1:N): Una sede puede estar relacionado con múltiples estudiantes, mientras que cada estudiate está vinculada a una única sede. ● ESTUDIANTE – SEDE (1:1): Un estudiante puede estar asociado a una sola víctima y cada víctima pertenece a un único estudiante.
+El modelo conceptual establece las siguientes relaciones entre entidades, de acuerdo con el diagrama proporcionado: ● Estudiantes – Cursos (N:M): Un curso puede contener múltiples estudiantes, mientras que cada estudiante pertenece a uno o varios cursos. ● MUNICIPIO – SEDE (1:N): Cada municipio está asociado a una única sede, representada por coordenadas específicas. ● SEDE – ESTUDIANTES (1:N): Una sede puede estar relacionado con múltiples estudiantes, mientras que cada estudiate está vinculada a una única sede. ● ESTUDIANTE – SEDE (1:1): Un estudiante puede estar asociado a una sola víctima y cada víctima pertenece a un único estudiante.
 
 ## Construcción del Modelo Lógico {#construcción-del-modelo-lógico}
 
@@ -147,7 +149,7 @@ Se traducen las entidades en tablas, los atributos en columnas y se definen clav
 
 ### Gráfica {#gráfica-1}
 
-
+![modelo logico](./img/logicomodel.jpg)
 
 ## Normalización del Modelo Lógico {#normalización-del-modelo-lógico}
 
