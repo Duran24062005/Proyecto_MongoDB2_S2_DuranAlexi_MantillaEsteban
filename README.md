@@ -383,6 +383,267 @@ El diseño presenta una mezcla de relaciones uno a muchos y muchos a muchos, est
 Las entidades Estudiantes y Profesores implementan un patrón de herencia o especialización sobre Usuarios mediante claves foráneas a usuario_id, lo que permite compartir atributos comunes mientras se mantienen características específicas de cada rol. Esta arquitectura facilita la extensibilidad del sistema si en el futuro se requieren tipos adicionales de usuarios con perfiles especializados. Las tablas transaccionales incluyen campos de tipo fecha que son críticos para auditoría y análisis temporal, sugiriendo que el sistema debe implementar validaciones a nivel de aplicación o mediante restricciones CHECK para garantizar coherencia en rangos de fechas, especialmente en Reservas_instrumento donde fecha_finrese debe ser posterior a fecha_rese.Retry
 
 
+---
+
+## Construcción del Modelo Lógico
+
+La construcción del modelo lógico de datos se desarrolló a partir del análisis funcional del sistema de gestión de escuelas de música, el cual busca centralizar la información relacionada con usuarios, profesores, estudiantes, cursos, sedes e instrumentos dentro de una misma estructura. Este modelo refleja la forma en que los datos se organizan y se relacionan entre sí, asegurando la coherencia y la integridad de la información. En el centro del modelo se encuentra la entidad Usuarios, que almacena los datos básicos de identificación, contacto y rol de cada persona dentro del sistema. A partir de esta entidad se establecen relaciones con otras tablas especializadas como Estudiantes y Profesores, las cuales amplían la información según el tipo de usuario. Los estudiantes cuentan con atributos específicos como el nivel musical y la sede a la que pertenecen, mientras que los profesores poseen campos adicionales como especialidad y experiencia.
+
+### Descripción
+
+El modelo conceptual representa un sistema integral de gestión para una institución educativa musical que opera en múltiples sedes geográficas. El diseño se estructura alrededor de tres componentes fundamentales: la gestión de identidades y permisos mediante usuarios y roles, la administración académica que incluye cursos, profesores y estudiantes, y el control de recursos físicos representado por los instrumentos musicales. La arquitectura permite que la institución coordine eficientemente las operaciones entre sus diferentes ubicaciones mientras mantiene un sistema centralizado de información y control administrativo.
+
+El sistema establece una clara jerarquía organizacional donde las sedes funcionan como núcleos operacionales que agrupan estudiantes, profesores, cursos e instrumentos. La separación entre usuarios genéricos y perfiles especializados como estudiantes y profesores permite una gestión flexible de identidades donde cada persona puede tener atributos específicos según su función dentro de la institución. Las entidades transaccionales como inscripciones y reservas de instrumentos capturan las interacciones dinámicas del ecosistema educativo, registrando cómo los estudiantes acceden a la oferta académica y a los recursos materiales necesarios para su formación musical, creando así un historial completo de la actividad institucional.
+
+#### Descripción de las entidades
+
+
+**1. Usuarios**
+
+Representa a todas las personas que tienen acceso y participan en el sistema de gestión institucional.
+Atributos:
+
+- **_id (PK):** Identificador único de cada usuario registrado.
+- **nombre_usuario:** Nombre completo de la persona.
+- **documento:** Número de identificación oficial del usuario.
+- **contacto:** Número telefónico para comunicación.
+- **email:** Dirección de correo electrónico del usuario.
+- **direccion:** Ubicación física o domicilio del usuario.
+- **rol_id (FK):** Referencia al rol que determina permisos y funcionalidades.
+
+Entidad base del sistema de autenticación que centraliza la información personal de todos los actores del sistema.
+
+---
+
+**2. Roles**
+
+Define los diferentes perfiles de acceso y niveles de autorización dentro del sistema.
+Atributos:
+
+- **_id (PK):** Identificador único del rol.
+- **nombre:** Denominación descriptiva del rol (administrador, docente, alumno, etc.).
+
+Entidad de configuración que implementa el modelo de seguridad basado en roles para controlar accesos y permisos.
+
+---
+
+**3. Sedes**
+
+Representa las ubicaciones físicas donde la institución musical tiene presencia operativa.
+Atributos:
+
+- **_id (PK):** Identificador único de cada sede.
+- **ciudad:** Ciudad donde está ubicada la instalación.
+- **direccion:** Dirección postal completa de la sede.
+- **capacidad:** Límite máximo de estudiantes que puede atender.
+- **cursos_disponibles:** Listado de programas educativos ofrecidos.
+- **n_estudiantes:** Contador de estudiantes actualmente matriculados.
+
+Entidad organizacional principal que distribuye geográficamente la operación y los recursos de la institución.
+
+---
+
+**4. Estudiantes**
+
+Representa a los alumnos matriculados que cursan programas de formación musical.
+Atributos:
+
+- **_id (PK):** Identificador único del estudiante.
+- **usuario_id (FK):** Vinculación con el registro de usuario correspondiente.
+- **nivel_musical:** Clasificación del grado de competencia o avance musical.
+- **id_sede (FK):** Sede principal de adscripción del estudiante.
+
+Entidad especializada que extiende la información de usuarios con atributos académicos específicos del perfil estudiantil.
+
+---
+
+**5. Profesores**
+
+Representa al personal docente encargado de impartir la formación musical.
+Atributos:
+
+- **_id (PK):** Identificador único del profesor.
+- **usuario_id (FK):** Vinculación con el registro de usuario del docente.
+- **especialidad:** Instrumento o área musical de expertise del profesor.
+- **experiencia:** Medida de años o nivel de trayectoria profesional.
+- **id_sede (FK):** Sede a la cual está asignado el profesor.
+
+Entidad que gestiona la información del cuerpo académico y su distribución entre las diferentes sedes.
+
+---
+
+**6. Cursos**
+
+Representa los programas educativos y clases que conforman la oferta académica institucional.
+Atributos:
+
+- **_id (PK):** Identificador único del curso.
+- **nombre_curso:** Título descriptivo del programa educativo.
+- **instrumento:** Instrumento musical principal del curso.
+- **horario:** Programación de días y horas de las sesiones.
+- **cupos:** Número máximo de estudiantes admitidos.
+- **duracion:** Extensión temporal del programa completo.
+- **nivel:** Grado de dificultad o prerrequisitos del curso.
+- **sede_id (FK):** Sede donde se imparte el curso.
+- **profesor_id (FK):** Docente responsable del curso.
+
+Entidad nuclear de la oferta educativa que vincula profesores, estudiantes y sedes en programas estructurados.
+
+---
+
+**7. Instrumentos**
+
+Representa el inventario de instrumentos musicales disponibles para uso de los estudiantes.
+Atributos:
+
+- **_id (PK):** Identificador único de cada instrumento.
+- **nombre_instu:** Tipo o clasificación del instrumento musical.
+- **disponibilidad:** Estado actual del recurso (libre, ocupado, mantenimiento).
+- **id_sede (FK):** Sede donde está físicamente ubicado el instrumento.
+
+Entidad de gestión patrimonial que controla los recursos instrumentales distribuidos en las instalaciones.
+
+--- 
+
+**8. Inscripciones**
+
+Registra las matrículas formales de estudiantes en los cursos ofrecidos.
+Atributos:
+
+- **_id (PK):** Identificador único de cada registro de inscripción.
+- **id_estudiante (FK):** Estudiante que formaliza la matrícula.
+- **id_sede (FK):** Sede donde se procesa la inscripción.
+- **id_curso (FK):** Curso al cual se inscribe el estudiante.
+- **fecha_inscripcion:** Timestamp del registro de la matrícula.
+
+Entidad asociativa que materializa la relación muchos a muchos entre estudiantes y cursos, creando el historial académico.
+
+---
+
+**9. Reservas_instrumento**
+
+Gestiona el sistema de préstamos temporales de instrumentos a estudiantes.
+Atributos:
+
+- **_id (PK):** Identificador único de cada reserva.
+- **id_instrumento (FK):** Instrumento que se asigna en préstamo.
+- **id_estudiante (FK):** Estudiante beneficiario del préstamo.
+- **fecha_rese:** Fecha de inicio del periodo de préstamo.
+- **fecha_finrese:** Fecha programada de devolución del instrumento.
+
+Entidad transaccional que controla el acceso compartido y temporal de estudiantes a los recursos instrumentales institucionales.
+
+---
+
+### Modelo Lógico
+
+```mermaid
+
+erDiagram
+    Usuarios ||--|| Roles : "tiene"
+    Usuarios ||--o{ Estudiantes : "puede_ser"
+    Usuarios ||--o{ Profesores : "puede_ser"
+    
+    Estudiantes ||--o{ Inscripciones : "realiza"
+    Estudiantes ||--o{ Reservas_instrumento : "hace"
+    Estudiantes }o--|| Sedes : "pertenece"
+    
+    Profesores }o--|| Sedes : "trabaja_en"
+    Profesores ||--o{ Cursos : "imparte"
+    
+    Sedes ||--o{ Cursos : "ofrece"
+    Sedes ||--o{ Inscripciones : "registra"
+    Sedes ||--o{ Instrumentos : "tiene"
+    
+    Cursos ||--o{ Inscripciones : "recibe"
+    
+    Instrumentos ||--o{ Reservas_instrumento : "es_reservado"
+    
+    Usuarios {
+        int id PK
+        string nombre_usuario
+        string documento
+        string contacto
+        string email
+        string direccion
+        int rol_id FK
+    }
+    
+    Roles {
+        int _id PK
+        string nombre
+    }
+    
+    Estudiantes {
+        int _id PK
+        int usuario_id FK
+        int id_sede FK
+        string nivel_musical
+    }
+    
+    Profesores {
+        int _id PK
+        int usuario_id FK
+        string especialidad
+        int experiencia
+        int id_sede FK
+    }
+    
+    Sedes {
+        int _id PK
+        string ciudad
+        string direccion
+        int capacidad
+        int cursos_disponibles
+        int n_estudiantes
+    }
+    
+    Cursos {
+        int _id PK
+        string nombre_curso
+        string instrumento
+        string horario
+        int cupos
+        int duracion
+        string nivel
+        int sede_id FK
+        int profesor_id FK
+    }
+    
+    Instrumentos {
+        int _id PK
+        string nombre_instu
+        string disponibilidad
+        int id_sede FK
+    }
+    
+    Inscripciones {
+        int _id PK
+        int id_estudiante FK
+        int id_sede FK
+        int id_curso FK
+        date fecha_inscripcion
+    }
+    
+    Reservas_instrumento {
+        int _id PK
+        int id_instrumento FK
+        int id_estudiante FK
+        date fecha_rese
+        date fecha_finrese
+    }
+
+```
+
+
+### Descripción Técnica
+
+El modelo implementa una arquitectura relacional normalizada que utiliza claves primarias artificiales con la convención _id en todas las entidades, garantizando unicidad independiente de los atributos naturales. Las relaciones entre tablas se materializan mediante claves foráneas que implementan restricciones de integridad referencial, asegurando consistencia en las asociaciones entre entidades. La estructura sugiere el uso estratégico de índices compuestos en las tablas transaccionales, particularmente en Inscripciones donde las consultas frecuentemente filtrarán por combinaciones de id_estudiante, id_curso e id_sede para verificar matrículas específicas o generar reportes de ocupación.
+
+El diseño presenta una arquitectura hub-and-spoke donde Sedes actúa como entidad central que conecta múltiples subsistemas del modelo, lo que implica que la mayoría de las consultas complejas involucrarán joins directos o indirectos con esta tabla. Esta centralidad podría representar un cuello de botella en sistemas con alta concurrencia, sugiriendo la necesidad de estrategias de particionamiento horizontal por sede o el uso de réplicas de lectura para distribución de carga. El campo n_estudiantes en Sedes indica una desnormalización intencional que probablemente se mantiene mediante triggers AFTER INSERT/DELETE en la tabla Estudiantes o mediante jobs programados que recalculan estos contadores periódicamente.
+
+Las entidades Estudiantes y Profesores implementan un patrón de extensión de tabla mediante usuario_id, creando una jerarquía donde los atributos comunes residen en Usuarios mientras los específicos se distribuyen en tablas especializadas. Esta arquitectura facilita la implementación de single sign-on y permite consultas eficientes de información básica sin necesidad de joins cuando solo se requieren datos del usuario. Las tablas asociativas Inscripciones y Reservas_instrumento incluyen campos temporales críticos que requieren validaciones a nivel de base de datos mediante constraints CHECK para garantizar coherencia temporal, asegurando que las fechas de inicio precedan a las de finalización y que no existan solapamientos en reservas del mismo instrumento mediante triggers BEFORE INSERT/UPDATE que verifiquen conflictos de disponibilidad.
+
 - [Requerimientos](./ProyectoMongoDB2.md)
 
 - [MongoDB Docs](https://www.mongodb.com/)
