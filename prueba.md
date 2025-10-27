@@ -768,3 +768,198 @@ MongoDB permite definir reglas de validación usando JSON Schema para garantizar
 - [Requerimientos](./ProyectoMongoDB2.md)
 
 - [MongoDB Docs](https://www.mongodb.com/)
+
+
+
+
+# Diagramas
+
+```mermaid 
+erDiagram
+    Usuario ||--o{ Profesores : "es"
+    Usuario ||--o{ Estudiantes : "es"
+    Usuario }o--|| Rol : "tiene"
+    
+    Profesores ||--o{ Sedes : "asigna"
+    Profesores }o--|| Cursos : "imparte"
+    
+    Estudiantes ||--o{ Reservas_instrumentos : "hace"
+    Estudiantes ||--o{ Inscripciones : "pueden"
+    
+    Sedes ||--o{ Cursos : "ofrece"
+    Sedes }o--o{ Reservas_instrumentos : "es_reservado"
+    
+    Instrumentos ||--o{ Reservas_instrumentos : "contiene"
+    Instrumentos ||--o{ Inscripciones : "pueden"
+    
+    Cursos ||--o{ Inscripciones : "recibe"
+    
+    Usuario {
+        int id PK
+        string documento
+        string nombre_usuario
+        string contacto
+        string email
+        string direccionm
+        int rol_id FK
+    }
+    
+    Rol {
+        int _id PK
+        string nombre
+    }
+    
+    Profesores {
+        int _id PK
+        int usuario_id FK
+        string especialidad
+        int experiencia
+        int sede_id FK
+    }
+    
+    Estudiantes {
+        int _id PK
+        int usuario_id FK
+        int sede_id FK
+        string nivel_musical
+    }
+    
+    Sedes {
+        int id_sede PK
+        string direccion
+        string ciudad
+        int cursos_disponibles
+        int capacidad
+        int n_estudiantes
+    }
+    
+    Reservas_instrumentos {
+        int id_instrumento PK
+        int id_estudiante FK
+        int id_sede FK
+        date fecha_rese
+        date fecha_finrese
+    }
+    
+    Instrumentos {
+        int id_instrumento PK
+        string nivel
+        int duracion
+        int cupos
+        string horario
+    }
+    
+    Cursos {
+        int id_curso PK
+        int id_sede FK
+        string nombre_intru
+        string disponibilidad
+    }
+    
+    Inscripciones {
+        int id_estudiante FK
+        int id_curso FK
+        int id_sede FK
+    }
+
+```
+
+## Modelo logico
+
+
+``` mermaid
+erDiagram
+    Usuarios ||--|| Roles : "tiene"
+    Usuarios ||--o{ Estudiantes : "puede_ser"
+    Usuarios ||--o{ Profesores : "puede_ser"
+    
+    Estudiantes ||--o{ Inscripciones : "realiza"
+    Estudiantes ||--o{ Reservas_instrumento : "hace"
+    Estudiantes }o--|| Sedes : "pertenece"
+    
+    Profesores }o--|| Sedes : "trabaja_en"
+    Profesores ||--o{ Cursos : "imparte"
+    
+    Sedes ||--o{ Cursos : "ofrece"
+    Sedes ||--o{ Inscripciones : "registra"
+    Sedes ||--o{ Instrumentos : "tiene"
+    
+    Cursos ||--o{ Inscripciones : "recibe"
+    
+    Instrumentos ||--o{ Reservas_instrumento : "es_reservado"
+    
+    Usuarios {
+        int id PK
+        string nombre_usuario
+        string documento
+        string contacto
+        string email
+        string direccion
+        int rol_id FK
+    }
+    
+    Roles {
+        int _id PK
+        string nombre
+    }
+    
+    Estudiantes {
+        int _id PK
+        int usuario_id FK
+        int id_sede FK
+        string nivel_musical
+    }
+    
+    Profesores {
+        int _id PK
+        int usuario_id FK
+        string especialidad
+        int experiencia
+        int id_sede FK
+    }
+    
+    Sedes {
+        int _id PK
+        string ciudad
+        string direccion
+        int capacidad
+        int cursos_disponibles
+        int n_estudiantes
+    }
+    
+    Cursos {
+        int _id PK
+        string nombre_curso
+        string instrumento
+        string horario
+        int cupos
+        int duracion
+        string nivel
+        int sede_id FK
+        int profesor_id FK
+    }
+    
+    Instrumentos {
+        int _id PK
+        string nombre_instu
+        string disponibilidad
+        int id_sede FK
+    }
+    
+    Inscripciones {
+        int _id PK
+        int id_estudiante FK
+        int id_sede FK
+        int id_curso FK
+        date fecha_inscripcion
+    }
+    
+    Reservas_instrumento {
+        int _id PK
+        int id_instrumento FK
+        int id_estudiante FK
+        date fecha_rese
+        date fecha_finrese
+    }
+
+```
