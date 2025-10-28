@@ -14,11 +14,11 @@ db.Inscripciones.aggregate([
     {
         $group: {
           _id:{id_sede:"$id_sede"},
-          cantidad_inscritos:{$}
+          cantidad_inscritos:{$sum:1},
           }
         
     }
-])
+]);
 
 // 2. ¿Cuáles son los cursos más demandados en cada sede?
 

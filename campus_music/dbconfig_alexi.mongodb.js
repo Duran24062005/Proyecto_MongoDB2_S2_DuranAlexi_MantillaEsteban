@@ -33,7 +33,7 @@ db.createCollection("Profesores",{
                 nombre_pro:{bsonType:"string"},
                 especialidad:{bsonType:"string"},
                 cursos_asignados:{bsonType:"array"},
-                esperiencia:{bsonType:"string"},
+                experiencia:{bsonType:"string"},
                 id_sede:{bsonType:"int"}
             }
         }
@@ -73,7 +73,8 @@ db.createCollection("Curso_profesor",{
             properties:{
                 _id:{bsonType:"int"},
                 id_curso:{bsonType:"int"},
-                id_sede:{bsonType:"int"}
+                id_sede:{bsonType:"int"},
+                id_profesor:{bsonType:"int"}
             }
         }
     }
@@ -101,8 +102,9 @@ db.createCollection('Usuarios', {
     validator: {
         $jsonSchema: {
             bsonType: 'object',
-            required: ['tipo_usuario', 'descripcion'],
+            required: ["_id",'tipo_usuario', 'descripcion'],
             properties: {
+                _id:{bsonType:"int"},
                 tipo_usuario: { bsonType: 'string' },
                 descripcion: { bsonType: 'string' }
             }
@@ -115,8 +117,9 @@ db.createCollection('Instrumentos', {
     validator: {
         $jsonSchema: {
             bsonType: 'object',
-            required: ['nombre_instrumento', 'id_Sede', 'disponibilidad'],
+            required: ["_id",'nombre_instrumento', 'id_sede', 'disponibilidad'],
             properties: {
+                _id:{bsonType:"int"},
                 nombre_instrumento: {bsonType: 'string'},
                 id_sede: {bsonType: 'int'},
                 disponibilidad: {bsonType: 'bool'}
@@ -130,8 +133,9 @@ db.createCollection('Inscripciones', {
     validator: {
         $jsonSchema: {
             bsonType: 'object',
-            required: ['id_estudiante', 'id_curso', 'id_sede'],
+            required: ["_id",'id_estudiante', 'id_curso', 'id_sede'],
             properties: {
+                _id:{bsonType:"int"},
                 id_estudiante: {bsonType: 'int'},
                 id_curso: {bsonType: 'int'},
                 id_sede: {bsonType: 'int'}
@@ -145,8 +149,9 @@ db.createCollection('Sedes', {
     validator: {
         $jsonSchema: {
             bsonType: 'object',
-            required: ['ciudad', 'direccion', 'capacidad', 'n_estudiantes', 'cursos_disponibles'],
+            required: ["_id",'ciudad', 'direccion', 'capacidad', 'n_estudiantes', 'cursos_disponibles'],
             properties: {
+                _id:{bsonType:"int"},
                 ciudad: {bsonType: 'string'},
                 direccion: {bsonType: 'string'},
                 capacidad: {bsonType: 'int'},

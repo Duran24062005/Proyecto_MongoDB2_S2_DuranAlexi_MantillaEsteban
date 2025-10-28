@@ -130,11 +130,12 @@ db.createCollection('Inscripciones', {
     validator: {
         $jsonSchema: {
             bsonType: 'object',
-            required: ['id_estudiante', 'id_curso', 'id_sede'],
+            required: ['id_estudiante', 'id_curso', 'id_sede',"fecha_inscripcion"],
             properties: {
                 id_estudiante: {bsonType: 'int'},
                 id_curso: {bsonType: 'int'},
-                id_sede: {bsonType: 'int'}
+                id_sede: {bsonType: 'int'},
+                fecha_inscripcion:{bsonType:"date"}
             }
         }
     }
