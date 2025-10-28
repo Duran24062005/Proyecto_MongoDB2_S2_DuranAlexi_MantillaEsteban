@@ -337,6 +337,9 @@ db.createUser({
 });
 
 
-db.getRoles();
+db.getRoles({ showBuiltinRoles: false });
 
 db.getUsers();
+
+
+// mongosh -u "editor_user" -p "12345" --authenticationDatabase "mi_app"
