@@ -1,8 +1,24 @@
 // agregaciones
 // 1. ¿Cuántos estudiantes se inscribieron por sede en el último mes?
-db.Sedes.aggregate(
-
-)
+db.Inscripciones.aggregate([
+    {
+        $addFields: {
+          mes:{$month:"$fecha_inscripcion"}
+        }
+    },
+    {
+        $match: {
+          mes:{$eq:8}
+        }
+    },
+    {
+        $group: {
+          _id:{id_sede:"$id_sede"},
+          cantidad_inscritos:{$}
+          }
+        
+    }
+])
 
 // 2. ¿Cuáles son los cursos más demandados en cada sede?
 
