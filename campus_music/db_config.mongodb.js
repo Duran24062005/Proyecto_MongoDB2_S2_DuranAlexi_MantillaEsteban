@@ -449,7 +449,7 @@ db.createCollection("Profesores",{
                 nombre_pro:{bsonType:"string"},
                 especialidad:{bsonType:"string"},
                 cursos_asignados:{bsonType:"array"},
-                esperiencia:{bsonType:"string"},
+                experiencia:{bsonType:"string"},
                 id_sede:{bsonType:"int"}
             }
         }
@@ -531,7 +531,7 @@ db.createCollection('Instrumentos', {
     validator: {
         $jsonSchema: {
             bsonType: 'object',
-            required: ['nombre_instrumento', 'id_Sede', 'disponibilidad'],
+            required: ['nombre_instrumento', 'id_sede', 'disponibilidad'],
             properties: {
                 nombre_instrumento: {bsonType: 'string'},
                 id_sede: {bsonType: 'int'},
@@ -546,11 +546,12 @@ db.createCollection('Inscripciones', {
     validator: {
         $jsonSchema: {
             bsonType: 'object',
-            required: ['id_estudiante', 'id_curso', 'id_sede'],
+            required: ['id_estudiante', 'id_curso', 'id_sede',"fecha_inscripcion"],
             properties: {
                 id_estudiante: {bsonType: 'int'},
                 id_curso: {bsonType: 'int'},
-                id_sede: {bsonType: 'int'}
+                id_sede: {bsonType: 'int'},
+                fecha_inscripcion: {bsonType: "date"}
             }
         }
     }
