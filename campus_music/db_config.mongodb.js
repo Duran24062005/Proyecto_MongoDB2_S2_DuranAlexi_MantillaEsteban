@@ -186,7 +186,7 @@ db.createCollection("profesores", {
           maxLength: 100,
           description: "Especialidad o instrumento principal"
         },
-        experiencia: {
+        experiencia_anios: {
           bsonType: ["int", "null"],
           minimum: 0,
           description: "Años de experiencia"
@@ -211,7 +211,7 @@ db.createCollection("cursos", {
   validator: {
     $jsonSchema: {
       bsonType: "object",
-      required: ["_id", "nombre_curso", "instrumento", "sede_id", "profesor_id"],
+      required: ["_id", "nombre_curso", "instrumento", "horario", "duracion_meses", "sede_id", "profesor_id"],
       properties: {
         _id: {
           bsonType: "int",
@@ -239,7 +239,7 @@ db.createCollection("cursos", {
           minimum: 1,
           description: "Número máximo de estudiantes"
         },
-        duracion: {
+        duracion_meses: {
           bsonType: ["int", "null"],
           minimum: 1,
           description: "Duración en meses"

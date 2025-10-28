@@ -316,56 +316,56 @@ db.profesores.insertMany([
     _id: 1,
     usuario_id: 5,
     especialidad: "Piano",
-    experiencia: 12,
+    experiencia_anios: 12,
     id_sede: 1
   },
   {
     _id: 2,
     usuario_id: 6,
     especialidad: "Guitarra",
-    experiencia: 8,
+    experiencia_anios: 8,
     id_sede: 2
   },
   {
     _id: 3,
     usuario_id: 7,
     especialidad: "Violín",
-    experiencia: 15,
+    experiencia_anios: 15,
     id_sede: 3
   },
   {
     _id: 4,
     usuario_id: 8,
     especialidad: "Batería",
-    experiencia: 6,
+    experiencia_anios: 6,
     id_sede: 4
   },
   {
     _id: 5,
     usuario_id: 9,
     especialidad: "Canto",
-    experiencia: 10,
+    experiencia_anios: 10,
     id_sede: 1
   },
   {
     _id: 6,
     usuario_id: 10,
     especialidad: "Bajo",
-    experiencia: 7,
+    experiencia_anios: 7,
     id_sede: 2
   },
   {
     _id: 7,
     usuario_id: 11,
     especialidad: "Saxofón",
-    experiencia: 9,
+    experiencia_anios: 9,
     id_sede: 3
   },
   {
     _id: 8,
     usuario_id: 12,
     especialidad: "Flauta",
-    experiencia: 11,
+    experiencia_anios: 11,
     id_sede: 4
   }
 ]);
@@ -399,7 +399,7 @@ db.cursos.insertMany([
     instrumento: "Piano",
     horario: "Lunes y Miércoles 2:00-4:00 PM",
     cupos: 10,
-    duracion: 6,
+    duracion_meses: 6,
     nivel: "Principiante",
     sede_id: 1,
     profesor_id: 1
@@ -410,7 +410,7 @@ db.cursos.insertMany([
     instrumento: "Piano",
     horario: "Martes y Jueves 3:00-5:00 PM",
     cupos: 8,
-    duracion: 8,
+    duracion_meses: 8,
     nivel: "Intermedio",
     sede_id: 1,
     profesor_id: 1
@@ -421,7 +421,7 @@ db.cursos.insertMany([
     instrumento: "Voz",
     horario: "Viernes 4:00-6:00 PM",
     cupos: 6,
-    duracion: 10,
+    duracion_meses: 10,
     nivel: "Avanzado",
     sede_id: 1,
     profesor_id: 5
@@ -433,7 +433,7 @@ db.cursos.insertMany([
     instrumento: "Guitarra",
     horario: "Lunes y Miércoles 10:00-12:00 AM",
     cupos: 12,
-    duracion: 5,
+    duracion_meses: 5,
     nivel: "Principiante",
     sede_id: 2,
     profesor_id: 2
@@ -444,7 +444,7 @@ db.cursos.insertMany([
     instrumento: "Guitarra",
     horario: "Martes y Jueves 5:00-7:00 PM",
     cupos: 8,
-    duracion: 12,
+    duracion_meses: 12,
     nivel: "Avanzado",
     sede_id: 2,
     profesor_id: 2
@@ -455,7 +455,7 @@ db.cursos.insertMany([
     instrumento: "Bajo",
     horario: "Sábados 9:00-11:00 AM",
     cupos: 10,
-    duracion: 6,
+    duracion_meses: 6,
     nivel: "Intermedio",
     sede_id: 2,
     profesor_id: 6
@@ -467,7 +467,7 @@ db.cursos.insertMany([
     instrumento: "Violín",
     horario: "Lunes, Miércoles y Viernes 2:00-4:00 PM",
     cupos: 8,
-    duracion: 8,
+    duracion_meses: 8,
     nivel: "Principiante",
     sede_id: 3,
     profesor_id: 3
@@ -478,7 +478,7 @@ db.cursos.insertMany([
     instrumento: "Violín",
     horario: "Martes y Jueves 4:00-6:00 PM",
     cupos: 6,
-    duracion: 10,
+    duracion_meses: 10,
     nivel: "Avanzado",
     sede_id: 3,
     profesor_id: 3
@@ -489,7 +489,7 @@ db.cursos.insertMany([
     instrumento: "Saxofón",
     horario: "Sábados 10:00-12:00 PM",
     cupos: 7,
-    duracion: 9,
+    duracion_meses: 9,
     nivel: "Intermedio",
     sede_id: 3,
     profesor_id: 7
@@ -501,7 +501,7 @@ db.cursos.insertMany([
     instrumento: "Batería",
     horario: "Lunes y Miércoles 6:00-8:00 PM",
     cupos: 5,
-    duracion: 6,
+    duracion_meses: 6,
     nivel: "Principiante",
     sede_id: 4,
     profesor_id: 4
@@ -512,7 +512,7 @@ db.cursos.insertMany([
     instrumento: "Batería",
     horario: "Martes y Jueves 6:00-8:00 PM",
     cupos: 5,
-    duracion: 10,
+    duracion_meses: 10,
     nivel: "Avanzado",
     sede_id: 4,
     profesor_id: 4
@@ -523,7 +523,7 @@ db.cursos.insertMany([
     instrumento: "Flauta",
     horario: "Sábados 2:00-4:00 PM",
     cupos: 12,
-    duracion: 4,
+    duracion_meses: 4,
     nivel: "Principiante",
     sede_id: 4,
     profesor_id: 8
