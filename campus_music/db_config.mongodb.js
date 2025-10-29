@@ -551,7 +551,11 @@ db.createCollection('Inscripciones', {
                 id_estudiante: {bsonType: 'int'},
                 id_curso: {bsonType: 'int'},
                 id_sede: {bsonType: 'int'},
+<<<<<<< HEAD
                 fecha_inscripcion: {bsonType: "date"}
+=======
+                fecha_inscripcion:{bsonType:"date"}
+>>>>>>> esteban
             }
         }
     }
