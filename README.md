@@ -2145,12 +2145,19 @@ logger.info({
 #### Buenas Prácticas Implementadas
 
 ✅ **Separación de privilegios** según función organizacional
+
 ✅ **Principio de menor privilegio** estrictamente aplicado
+
 ✅ **Contraseñas complejas** con requisitos mínimos de seguridad
+
 ✅ **Metadata descriptiva** en customData para trazabilidad
+
 ✅ **Roles granulares** a nivel de colección y operación
+
 ✅ **Sin usuarios genéricos** - todos nominales para auditoría
+
 ✅ **Validación multinivel** - base de datos + aplicación
+
 ✅ **Documentación exhaustiva** de cada rol y sus capacidades
 
 
