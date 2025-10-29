@@ -236,7 +236,7 @@ db.createCollection("cursos", {
         },
         cupos: {
           bsonType: ["int", "null"],
-          minimum: 1,
+          minimum: 0,
           description: "Número máximo de estudiantes"
         },
         duracion_meses: {

@@ -1,4 +1,4 @@
- use('Campus_Music');
+use('Campus_Music');
 
 
 /*
@@ -10,7 +10,7 @@
 */
 
 
-async function InscribirEstudianteConTransaccion(
+function InscribirEstudianteConTransaccion(
     id_inscripcion,
     id_estudiante,
     id_curso,
@@ -30,11 +30,13 @@ async function InscribirEstudianteConTransaccion(
             readPreference: "primary"
         });
 
+        // Obtener colecciones con la sesión
+        const cursosCol = session.getDatabase('Campus_Music').getCollection('cursos');
+        const estudiantesCol = session.getDatabase('Campus_Music').getCollection('estudiantes');
+        const inscripcionesCol = session.getDatabase('Campus_Music').getCollection('inscripciones');
+
         // ============= Paso 3: Validar cupos disponibles =============
-        const curso = db.cursos.findOne(
-            {_id: id_curso},
-            {session: session}
-        );
+        const curso = cursosCol.findOne({_id: id_curso});
 
         // validación de curso
         if (!curso) {
@@ -48,10 +50,7 @@ async function InscribirEstudianteConTransaccion(
         };
 
         // ============= Paso 4: Validar que el estudiante exista =============
-        const estudiante = db.estudiantes.findOne(
-            {_id: id_estudiante},
-            {session: session}
-        );
+        const estudiante = estudiantesCol.findOne({_id: id_estudiante});
 
         // validación de existencia del estudiante
         if (!estudiante) {
@@ -59,13 +58,10 @@ async function InscribirEstudianteConTransaccion(
         };
 
         // ============= Paso 5: Validar la inscripción =============
-        const inscripcionExistente = db.inscripciones.findOne(
-            {
-                _id: id_inscripcion,
-                id_curso: id_curso
-            },
-            {session: session}
-        );
+        const inscripcionExistente = inscripcionesCol.findOne({
+            id_estudiante: id_estudiante,
+            id_curso: id_curso
+        });
 
         // validación de inscripción del estudiante
         if (inscripcionExistente) {
@@ -74,23 +70,19 @@ async function InscribirEstudianteConTransaccion(
 
 
         // ============= Paso 6: Insertar inscripción =============
-        const resultadoInscripcion = db.inscripciones.insertOne(
-            {
-                _id: id_inscripcion,
-                id_estudiante: id_estudiante,
-                id_sede: id_sede,
-                id_curso: id_curso,
-                fecha_inscripcion: fecha_inscripcion
-            },
-            { session: session }
-        );
+        const resultadoInscripcion = inscripcionesCol.insertOne({
+            _id: id_inscripcion,
+            id_estudiante: id_estudiante,
+            id_sede: id_sede,
+            id_curso: id_curso,
+            fecha_inscripcion: fecha_inscripcion
+        });
 
 
         // ============= Paso 7: Decrementar cupos del curso =============
-        const resultadoCurso = db.cursos.updateOne(
+        const resultadoCurso = cursosCol.updateOne(
             { _id: id_curso },
-            { $inc: { cupos: -1 } },
-            { session: session }
+            { $inc: { cupos: -1 } }
         );
 
 
@@ -100,7 +92,7 @@ async function InscribirEstudianteConTransaccion(
 
         // ============= Paso 8: Commit de la transaccion =============
         // Guardar los datos
-        await session.commitTransaction();
+        session.commitTransaction();
 
         // retorno
         return {
@@ -116,7 +108,7 @@ async function InscribirEstudianteConTransaccion(
         console.log(`Error: ${error.message}\n`);
 
         // Abortar la transacción (rollback)
-        await session.abortTransaction();
+        session.abortTransaction();
 
         return {
             success: false,
@@ -136,9 +128,9 @@ async function InscribirEstudianteConTransaccion(
 
 // ============= Casos de prueba =============
 // ============= 1. Prueba exitosa =============
-async function pruebaExitosa(params) {
+function pruebaExitosa(params) {
     const fecha = new Date("2025-10-28");
-    const resultado1 = await InscribirEstudianteConTransaccion(
+    const resultado1 = InscribirEstudianteConTransaccion(
         31,
         1,
         4,
@@ -148,33 +140,35 @@ async function pruebaExitosa(params) {
     printjson(resultado1);
 }
 
-pruebaExitosa().then();
+pruebaExitosa();
 
 
 // ============= 2. Inscripción duplicada =============
-async function inscripcionDuplicada () {
-    const resultado2 = await InscribirEstudianteConTransaccion(
+function inscripcionDuplicada () {
+    const fecha = new Date("2025-10-28");
+    const resultado2 = InscribirEstudianteConTransaccion(
         31,
         1,
-        1,
-        1,
+        4,
+        2,
         fecha
     );
     printjson(resultado2);
 }
 
-inscripcionDuplicada().then();
+inscripcionDuplicada();
 
 
 // ============= 3. Estudiante sin cupos =============
-async function estudianteSinCupo () {
-    // primero, forzamos un curso a tener 0 cupos
+function estudianteSinCupo () {
+    const fecha = new Date("2025-10-28");
+    // primero, forzamos un curso a tener 1 cupo
     db.cursos.updateOne(
         { _id: 12 },
-        { $set: { cupos: 0 } }
+        { $set: { cupos: 1 } }
     );
     
-    const resultado3 = await InscribirEstudianteConTransaccion(
+    const resultado3 = InscribirEstudianteConTransaccion(
         33,
         10,  // Nicolas Muñoz
         12,  // Curso sin cupos
@@ -190,11 +184,12 @@ async function estudianteSinCupo () {
     );
 }
 
-estudianteSinCupo().then();
+estudianteSinCupo();
 
 // ============= 4. Estudiante no existe =============
-async function estudianteNoExistente () {
-    const resultado4 = await InscribirEstudianteConTransaccion(
+function estudianteNoExistente () {
+    const fecha = new Date("2025-10-28");
+    const resultado4 = InscribirEstudianteConTransaccion(
         34,
         999,
         5,
@@ -204,4 +199,4 @@ async function estudianteNoExistente () {
     printjson(resultado4);
 }
 
-estudianteNoExistente().then();
+estudianteNoExistente();
