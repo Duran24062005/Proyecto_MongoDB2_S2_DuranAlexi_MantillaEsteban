@@ -955,12 +955,1206 @@ Sin embargo, existe un área potencial de mejora en la tabla **Sedes** con el ca
 
 </div>
 
+### Creación de los JSON Schema e Índices
 
-### Creación de los *Json Schema* e *Indices*
-### Poblado de las *Colecciones*
-### Creación de *Roles*
-### Agregaciones - Aggregations
-### Transaciones - Transactions
+#### Descripción General
+
+La implementación física del sistema Campus Music en MongoDB se fundamenta en el uso de validaciones JSON Schema que garantizan la integridad de los datos a nivel de base de datos, complementadas con índices estratégicamente diseñados para optimizar el rendimiento de las consultas más frecuentes del sistema. Esta fase representa la materialización del diseño lógico en estructuras concretas de MongoDB, aprovechando sus capacidades nativas de validación y optimización.
+
+Las validaciones JSON Schema actúan como el primer nivel de defensa contra datos inconsistentes, definiendo tipos de datos específicos, rangos válidos, campos obligatorios y restricciones de negocio que se aplican automáticamente en cada operación de escritura. Complementariamente, los índices se han diseñado siguiendo un análisis cuidadoso de los patrones de acceso identificados en los requerimientos funcionales, priorizando las consultas de búsqueda, filtrado y agregación que el sistema ejecutará con mayor frecuencia.
+
+---
+
+##### Colección: roles
+
+**Propósito:** Define los diferentes perfiles de usuario dentro del sistema, estableciendo la base para el control de acceso basado en roles (RBAC).
+
+**Esquema de Validación:**
+
+```javascript
+{
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["_id", "nombre"],
+      properties: {
+        _id: {
+          bsonType: "int",
+          description: "ID único del rol - requerido"
+        },
+        nombre: {
+          bsonType: "string",
+          minLength: 1,
+          maxLength: 50,
+          description: "Nombre del rol - requerido"
+        }
+      }
+    }
+  }
+}
+```
+
+**Validaciones Implementadas:**
+- **Campo _id:** Tipo entero que garantiza unicidad mediante primary key implícita de MongoDB
+- **Campo nombre:** Cadena de texto con longitud controlada entre 1 y 50 caracteres, ideal para nombres descriptivos como "Administrador" o "Estudiante"
+- **Campos requeridos:** Ambos campos son obligatorios, previniendo la creación de roles incompletos
+
+**Índices Creados:**
+
+```javascript
+db.roles.createIndex({ nombre: 1 }, { unique: true });
+```
+
+**Justificación del Índice:**
+- **Índice único en nombre:** Previene la duplicación de roles con el mismo nombre, crítico para mantener la coherencia del sistema de permisos. El índice también acelera búsquedas de roles por nombre durante autenticación.
+
+**Ejemplo de Uso:**
+```javascript
+// Consulta optimizada por índice único
+db.roles.find({ nombre: "Estudiante" });
+```
+
+---
+
+#### Colección: usuarios
+
+**Propósito:** Almacena la información personal y de contacto de todas las personas que interactúan con el sistema, vinculándolas con su rol correspondiente.
+
+**Esquema de Validación:**
+
+```javascript
+{
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["_id", "nombre_usuario", "documento", "email", "rol_id"],
+      properties: {
+        _id: { bsonType: "int" },
+        nombre_usuario: {
+          bsonType: "string",
+          minLength: 2,
+          maxLength: 100
+        },
+        documento: {
+          bsonType: "string",
+          pattern: "^[0-9]+$",
+          minLength: 6,
+          maxLength: 20
+        },
+        contacto: {
+          bsonType: ["string", "null"],
+          pattern: "^[0-9+\\-\\s()]*$",
+          maxLength: 20
+        },
+        email: {
+          bsonType: "string",
+          pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+          maxLength: 100
+        },
+        direccion: {
+          bsonType: ["string", "null"],
+          maxLength: 200
+        },
+        rol_id: { bsonType: "int" }
+      }
+    }
+  }
+}
+```
+
+**Validaciones Implementadas:**
+- **Campo documento:** Validación mediante regex que garantiza solo dígitos numéricos, longitud entre 6 y 20 caracteres para soportar diferentes tipos de documentos de identidad
+- **Campo email:** Regex complejo que valida formato estándar de correo electrónico, previniendo direcciones malformadas
+- **Campo contacto:** Permite caracteres numéricos y símbolos comunes en números telefónicos internacionales (+, -, paréntesis, espacios)
+- **Campos opcionales:** contacto y direccion pueden ser null, reconociendo que no siempre están disponibles en el registro inicial
+
+**Índices Creados:**
+
+```javascript
+db.usuarios.createIndex({ documento: 1 }, { unique: true });
+db.usuarios.createIndex({ email: 1 }, { unique: true });
+db.usuarios.createIndex({ rol_id: 1 });
+db.usuarios.createIndex({ nombre_usuario: 1 });
+```
+
+**Justificación de Índices:**
+- **Índice único en documento:** Previene usuarios duplicados, consulta crítica durante login y validaciones de identidad
+- **Índice único en email:** Garantiza emails únicos, acelera autenticación por correo y recuperación de contraseñas
+- **Índice en rol_id:** Optimiza filtrado de usuarios por tipo (ej: listar todos los estudiantes), operación frecuente en reportes administrativos
+- **Índice en nombre_usuario:** Acelera búsquedas de usuarios por nombre, funcionalidad común en interfaces administrativas
+
+---
+
+#### Colección: sedes
+
+**Propósito:** Representa las ubicaciones físicas donde opera Campus Music, organizando la distribución geográfica de recursos y estudiantes.
+
+**Esquema de Validación:**
+
+```javascript
+{
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["_id", "ciudad", "direccion", "capacidad"],
+      properties: {
+        _id: { bsonType: "int" },
+        ciudad: {
+          bsonType: "string",
+          minLength: 2,
+          maxLength: 100
+        },
+        direccion: {
+          bsonType: "string",
+          minLength: 5,
+          maxLength: 200
+        },
+        capacidad: {
+          bsonType: "int",
+          minimum: 1
+        },
+        cursos_disponibles: {
+          bsonType: ["int", "null"],
+          minimum: 0
+        },
+        n_estudiantes: {
+          bsonType: ["int", "null"],
+          minimum: 0
+        }
+      }
+    }
+  }
+}
+```
+
+**Validaciones Implementadas:**
+- **Campo capacidad:** Entero mayor a 1, garantiza que cada sede tenga al menos un cupo disponible
+- **Campos calculados:** cursos_disponibles y n_estudiantes son opcionales (null) pero cuando existen deben ser no negativos, permitiendo su actualización gradual
+- **Campo direccion:** Mínimo 5 caracteres para garantizar direcciones completas y descriptivas
+
+**Índices Creados:**
+
+```javascript
+db.sedes.createIndex({ ciudad: 1 });
+db.sedes.createIndex({ capacidad: 1 });
+db.sedes.createIndex({ n_estudiantes: 1 });
+```
+
+**Justificación de Índices:**
+- **Índice en ciudad:** Acelera filtrado de sedes por ubicación geográfica, usado en interfaces de selección y reportes regionales
+- **Índice en capacidad:** Optimiza consultas de sedes con mayor/menor capacidad, útil en análisis de expansión
+- **Índice en n_estudiantes:** Facilita ordenamiento por ocupación actual, crítico para balanceo de carga entre sedes
+
+---
+
+#### Colección: estudiantes
+
+**Propósito:** Almacena información específica del perfil académico de estudiantes, extendiendo la información base de usuarios.
+
+**Esquema de Validación:**
+
+```javascript
+{
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["_id", "usuario_id", "id_sede"],
+      properties: {
+        _id: { bsonType: "int" },
+        usuario_id: { bsonType: "int" },
+        id_sede: { bsonType: "int" },
+        nivel_musical: {
+          bsonType: ["string", "null"],
+          enum: ["Principiante", "Intermedio", "Avanzado", "Profesional", null]
+        }
+      }
+    }
+  }
+}
+```
+
+**Validaciones Implementadas:**
+- **Campo nivel_musical:** Enumeración controlada que garantiza consistencia en la clasificación de estudiantes, permitiendo null para estudiantes sin evaluación inicial
+- **Relaciones obligatorias:** usuario_id e id_sede son requeridos, garantizando que cada estudiante esté vinculado a un usuario y una sede
+
+**Índices Creados:**
+
+```javascript
+db.estudiantes.createIndex({ usuario_id: 1 }, { unique: true });
+db.estudiantes.createIndex({ id_sede: 1 });
+db.estudiantes.createIndex({ nivel_musical: 1 });
+db.estudiantes.createIndex({ id_sede: 1, nivel_musical: 1 });
+```
+
+**Justificación de Índices:**
+- **Índice único en usuario_id:** Garantiza la relación 1:1 entre usuarios y estudiantes, previene duplicación de perfiles
+- **Índice en id_sede:** Acelera listado de estudiantes por sede, operación frecuente en gestión local
+- **Índice en nivel_musical:** Optimiza filtrado de estudiantes por nivel para asignación de cursos apropiados
+- **Índice compuesto sede+nivel:** Consulta altamente optimizada para reportes de distribución de estudiantes por sede y nivel
+
+---
+
+#### Colección: profesores
+
+**Propósito:** Gestiona la información del cuerpo docente, incluyendo especialidades y asignaciones de sede.
+
+**Esquema de Validación:**
+
+```javascript
+{
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["_id", "usuario_id", "id_sede"],
+      properties: {
+        _id: { bsonType: "int" },
+        usuario_id: { bsonType: "int" },
+        especialidad: {
+          bsonType: ["string", "null"],
+          maxLength: 100
+        },
+        experiencia_anios: {
+          bsonType: ["int", "null"],
+          minimum: 0
+        },
+        id_sede: { bsonType: "int" }
+      }
+    }
+  }
+}
+```
+
+**Validaciones Implementadas:**
+- **Campo experiencia_anios:** Validación de rango no negativo, garantiza datos lógicos de trayectoria profesional
+- **Campo especialidad:** Longitud máxima controlada, permite descripciones completas sin excesos
+
+**Índices Creados:**
+
+```javascript
+db.profesores.createIndex({ usuario_id: 1 }, { unique: true });
+db.profesores.createIndex({ id_sede: 1 });
+db.profesores.createIndex({ especialidad: 1 });
+db.profesores.createIndex({ id_sede: 1, especialidad: 1 });
+```
+
+**Justificación de Índices:**
+- **Índice único en usuario_id:** Garantiza relación 1:1, similar a estudiantes
+- **Índice en especialidad:** Acelera búsqueda de profesores por instrumento o área musical
+- **Índice compuesto sede+especialidad:** Optimiza asignación de profesores a cursos específicos en cada ubicación
+
+---
+
+#### Colección: cursos
+
+**Propósito:** Define la oferta académica del sistema, vinculando sedes, profesores e instrumentos en programas estructurados.
+
+**Esquema de Validación:**
+
+```javascript
+{
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["_id", "nombre_curso", "instrumento", "horario", 
+                 "duracion_meses", "sede_id", "profesor_id", "costo", "activo"],
+      properties: {
+        _id: { bsonType: "int" },
+        nombre_curso: {
+          bsonType: "string",
+          minLength: 3,
+          maxLength: 150
+        },
+        instrumento: {
+          bsonType: "string",
+          minLength: 2,
+          maxLength: 50
+        },
+        horario: {
+          bsonType: ["string", "null"],
+          maxLength: 100
+        },
+        cupos: {
+          bsonType: ["int", "null"],
+          minimum: 0
+        },
+        duracion_meses: {
+          bsonType: ["int", "null"],
+          minimum: 1
+        },
+        nivel: {
+          bsonType: ["string", "null"],
+          enum: ["Principiante", "Intermedio", "Avanzado", "Profesional", null]
+        },
+        sede_id: { bsonType: "int" },
+        profesor_id: { bsonType: "int" },
+        costo: { bsonType: "int" },
+        activo: { bsonType: "bool" }
+      }
+    }
+  }
+}
+```
+
+**Validaciones Implementadas:**
+- **Campo cupos:** Validación no negativa, crítica para control de inscripciones
+- **Campo duracion_meses:** Mínimo 1 mes, garantiza cursos con duración lógica
+- **Campo nivel:** Enum coherente con niveles de estudiantes, facilita matching
+- **Campo activo:** Boolean que permite desactivar cursos sin eliminarlos, preservando históricos
+
+**Índices Creados:**
+
+```javascript
+db.cursos.createIndex({ sede_id: 1 });
+db.cursos.createIndex({ profesor_id: 1 });
+db.cursos.createIndex({ instrumento: 1 });
+db.cursos.createIndex({ nivel: 1 });
+db.cursos.createIndex({ sede_id: 1, instrumento: 1 });
+db.cursos.createIndex({ sede_id: 1, nivel: 1 });
+db.cursos.createIndex({ instrumento: 1, nivel: 1 });
+```
+
+**Justificación de Índices:**
+- **Múltiples índices simples:** Aceleran búsquedas individuales por sede, profesor, instrumento o nivel
+- **Índices compuestos:** Optimizan consultas frecuentes como "cursos de Piano en Bogotá" o "cursos de nivel Avanzado en Medellín"
+- **Cobertura de queries:** Los índices compuestos cubren las principales pantallas de búsqueda de cursos en la interfaz de usuario
+
+---
+
+#### Colección: instrumentos
+
+**Propósito:** Controla el inventario de instrumentos musicales disponibles en cada sede para préstamo a estudiantes.
+
+**Esquema de Validación:**
+
+```javascript
+{
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["_id", "nombre_instu", "disponibilidad", "id_sede"],
+      properties: {
+        _id: { bsonType: "int" },
+        nombre_instu: {
+          bsonType: "string",
+          minLength: 2,
+          maxLength: 100
+        },
+        disponibilidad: {
+          bsonType: "string",
+          enum: ["Disponible", "Reservado", "En mantenimiento", "Fuera de servicio"]
+        },
+        id_sede: { bsonType: "int" }
+      }
+    }
+  }
+}
+```
+
+**Validaciones Implementadas:**
+- **Campo disponibilidad:** Enum de estados que refleja el ciclo de vida completo de un instrumento, desde disponible hasta fuera de servicio
+- **Control de estados:** La enumeración previene estados inválidos que podrían causar conflictos en reservas
+
+**Índices Creados:**
+
+```javascript
+db.instrumentos.createIndex({ id_sede: 1 });
+db.instrumentos.createIndex({ disponibilidad: 1 });
+db.instrumentos.createIndex({ nombre_instu: 1 });
+db.instrumentos.createIndex({ id_sede: 1, disponibilidad: 1 });
+db.instrumentos.createIndex({ id_sede: 1, nombre_instu: 1 });
+```
+
+**Justificación de Índices:**
+- **Índice compuesto sede+disponibilidad:** Query crítica "instrumentos disponibles en sede X" para el sistema de reservas
+- **Índice compuesto sede+nombre:** Facilita inventarios y búsquedas específicas de instrumentos por ubicación
+
+---
+
+#### Colección: inscripciones
+
+**Propósito:** Registra las matrículas de estudiantes en cursos, materializando la relación many-to-many entre ambas entidades.
+
+**Esquema de Validación:**
+
+```javascript
+{
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["_id", "id_estudiante", "id_sede", "id_curso", "fecha_inscripcion"],
+      properties: {
+        _id: { bsonType: "int" },
+        id_estudiante: { bsonType: "int" },
+        id_sede: { bsonType: "int" },
+        id_curso: { bsonType: "int" },
+        fecha_inscripcion: { bsonType: "date" }
+      }
+    }
+  }
+}
+```
+
+**Validaciones Implementadas:**
+- **Todos los campos requeridos:** Garantiza que cada inscripción capture todas las dimensiones necesarias para auditoría
+- **Campo fecha_inscripcion:** Tipo date nativo de MongoDB, facilita queries temporales y ordenamiento cronológico
+
+**Índices Creados:**
+
+```javascript
+db.inscripciones.createIndex({ id_estudiante: 1 });
+db.inscripciones.createIndex({ id_curso: 1 });
+db.inscripciones.createIndex({ id_sede: 1 });
+db.inscripciones.createIndex({ fecha_inscripcion: -1 });
+db.inscripciones.createIndex({ id_estudiante: 1, id_curso: 1 }, { unique: true });
+db.inscripciones.createIndex({ id_curso: 1, fecha_inscripcion: -1 });
+db.inscripciones.createIndex({ id_sede: 1, fecha_inscripcion: -1 });
+```
+
+**Justificación de Índices:**
+- **Índice único compuesto estudiante+curso:** Previene inscripciones duplicadas del mismo estudiante en el mismo curso
+- **Índice descendente en fecha:** Orden inverso optimizado para listar inscripciones recientes primero
+- **Índices compuestos con fecha:** Aceleran reportes temporales por curso y por sede
+
+---
+
+#### Colección: reservas_instrumento
+
+**Propósito:** Gestiona el préstamo temporal de instrumentos a estudiantes, controlando fechas de inicio y fin.
+
+**Esquema de Validación:**
+
+```javascript
+{
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["_id", "id_instrumento", "id_estudiante", "fecha_rese", "fecha_finrese"],
+      properties: {
+        _id: { bsonType: "int" },
+        id_instrumento: { bsonType: "int" },
+        id_estudiante: { bsonType: "int" },
+        fecha_rese: { bsonType: "date" },
+        fecha_finrese: { bsonType: "date" }
+      }
+    }
+  }
+}
+```
+
+**Validaciones Implementadas:**
+- **Campos de fecha requeridos:** Ambas fechas obligatorias garantizan ventanas de reserva completas
+- **Tipo date:** Permite validaciones temporales y cálculos de duración a nivel de aplicación
+
+**Índices Creados:**
+
+```javascript
+db.reservas_instrumento.createIndex({ id_instrumento: 1 });
+db.reservas_instrumento.createIndex({ id_estudiante: 1 });
+db.reservas_instrumento.createIndex({ fecha_rese: 1 });
+db.reservas_instrumento.createIndex({ fecha_finrese: 1 });
+db.reservas_instrumento.createIndex({ id_instrumento: 1, fecha_rese: 1, fecha_finrese: 1 });
+db.reservas_instrumento.createIndex({ id_estudiante: 1, fecha_rese: -1 });
+db.reservas_instrumento.createIndex({ fecha_rese: 1, fecha_finrese: 1 });
+```
+
+**Justificación de Índices:**
+- **Índice compuesto instrumento+fechas:** Query crítica para detectar conflictos de reservas del mismo instrumento
+- **Índice compuesto estudiante+fecha descendente:** Lista histórico de reservas del estudiante con las más recientes primero
+- **Índice compuesto de rango de fechas:** Optimiza búsquedas de reservas activas en un periodo específico
+
+---
+
+### Poblado de las Colecciones
+
+#### Estrategia de Datos de Prueba
+
+El poblamiento de la base de datos se realizó con datos realistas y coherentes que simulan el funcionamiento de Campus Music con 4 sedes operativas en las principales ciudades de Colombia. La estrategia siguió principios de calidad de datos de prueba: coherencia referencial entre colecciones, distribución balanceada de registros por sede, variedad en los tipos de datos y simulación de escenarios reales de operación incluyendo casos edge como instrumentos en mantenimiento y cursos con cupos agotados.
+
+#### Volumen de Datos Insertados
+
+- **4 Sedes:** Bogotá, Medellín, Cali, Barranquilla
+- **4 Roles:** Administrador, Empleado_Sede, Estudiante, Profesor
+- **28 Usuarios:** 2 administradores, 2 empleados, 20 profesores, 16 estudiantes (con perfiles completos)
+- **20 Profesores:** Distribuidos equitativamente entre sedes, con especialidades variadas
+- **16 Estudiantes:** Con niveles musicales diversos (Principiante, Intermedio, Avanzado)
+- **20 Cursos:** 5 cursos por sede, cubriendo instrumentos principales (Piano, Guitarra, Violín, Batería, Canto)
+- **20 Instrumentos:** Distribuidos por sedes, incluyendo estados de disponibilidad variados
+- **30 Inscripciones:** Simulando matrículas con fechas distribuidas entre septiembre y octubre 2024
+- **12 Reservas:** Préstamos de instrumentos con ventanas temporales realistas
+
+#### Datos de Roles
+
+```javascript
+db.roles.insertMany([
+  { _id: 1, nombre: "Administrador" },
+  { _id: 2, nombre: "Empleado_Sede" },
+  { _id: 3, nombre: "Estudiante" },
+  { _id: 4, nombre: "Profesor" }
+]);
+```
+
+**Descripción:** Catálogo base de roles del sistema que permite implementar control de acceso basado en roles (RBAC). Cada rol tiene permisos específicos definidos en la capa de seguridad.
+
+#### Datos de Sedes
+
+```javascript
+db.sedes.insertMany([
+  {
+    _id: 1,
+    ciudad: "Bogotá",
+    direccion: "Calle 72 #10-34, Chapinero",
+    capacidad: 150,
+    cursos_disponibles: 12,
+    n_estudiantes: 85
+  },
+  // ... 3 sedes más
+]);
+```
+
+**Características:**
+- Direcciones reales de sectores reconocidos en cada ciudad
+- Capacidades variables que reflejan tamaños de instalación diferentes
+- Contadores de cursos y estudiantes que sirven como métricas de ocupación
+
+#### Datos de Usuarios
+
+Se insertaron 28 usuarios completos con información personal coherente, distribuyéndolos en los 4 roles del sistema. Cada usuario incluye:
+
+- Documentos de identidad únicos de 10 dígitos
+- Contactos telefónicos con formato colombiano (310-320 códigos de móvil)
+- Emails corporativos para administradores/empleados/profesores
+- Emails personales para estudiantes
+- Direcciones específicas de cada ciudad
+
+**Ejemplo de Administrador:**
+```javascript
+{
+  _id: 1,
+  nombre_usuario: "Carlos Méndez",
+  documento: "1234567890",
+  contacto: "3101234567",
+  email: "carlos.mendez@campusmusic.com",
+  direccion: "Calle 80 #15-20, Bogotá",
+  rol_id: 1
+}
+```
+
+**Ejemplo de Estudiante:**
+```javascript
+{
+  _id: 13,
+  nombre_usuario: "María Fernanda Díaz",
+  documento: "1010101010",
+  contacto: "3111010101",
+  email: "maria.diaz@estudiante.com",
+  direccion: "Calle 60 #8-15, Bogotá",
+  rol_id: 3
+}
+```
+
+#### Datos de Profesores
+
+20 profesores distribuidos equitativamente (5 por sede) con especialidades que cubren los principales instrumentos:
+
+- Piano (4 profesores en diferentes sedes)
+- Guitarra (4 profesores)
+- Violín, Batería, Canto, Bajo, Percusión, Teclado, Saxofón, Clarinete
+
+**Ejemplo:**
+```javascript
+{
+  _id: 1,
+  usuario_id: 21,
+  especialidad: "Piano",
+  experiencia_anios: 3,
+  id_sede: 1
+}
+```
+
+#### Datos de Estudiantes
+
+16 estudiantes con niveles musicales distribuidos:
+- 6 Principiantes
+- 5 Intermedios
+- 5 Avanzados
+
+Distribuidos entre las 4 sedes para simular carga balanceada.
+
+**Ejemplo:**
+```javascript
+{
+  _id: 1,
+  usuario_id: 13,
+  id_sede: 1,
+  nivel_musical: "Principiante"
+}
+```
+
+#### Datos de Cursos
+
+20 cursos con características realistas:
+- Horarios diversos (mañana, tarde, noche, fines de semana)
+- Cupos entre 6-12 estudiantes según tipo de instrumento
+- Duraciones de 3-6 meses
+- Costos escalonados por nivel: $150,000 (Principiante), $200,000 (Intermedio), $250,000 (Avanzado), $300,000 (Profesional)
+- Todos marcados como activos
+
+**Ejemplo Bogotá:**
+```javascript
+{
+  _id: 1,
+  nombre_curso: "Piano Básico",
+  instrumento: "Piano",
+  horario: "Lunes y Miércoles 3-5pm",
+  cupos: 10,
+  duracion_meses: 3,
+  nivel: "Principiante",
+  costo: 150000,
+  sede_id: 1,
+  profesor_id: 1,
+  activo: true
+}
+```
+
+#### Datos de Instrumentos
+
+20 instrumentos con estados variados para simular operación real:
+- 15 Disponibles
+- 3 Reservados
+- 1 En mantenimiento
+- 1 Fuera de servicio
+
+Incluye instrumentos diversos: Pianos Yamaha/Kawai/Roland, Guitarras Fender/Gibson, Violines Stradivarius, Baterías Pearl/Tama, Micrófonos Shure/Sennheiser, Saxofones Yamaha/Selmer.
+
+**Ejemplo:**
+```javascript
+{
+  _id: 1,
+  nombre_instu: "Piano Yamaha C3",
+  disponibilidad: "Disponible",
+  id_sede: 1
+}
+```
+
+#### Datos de Inscripciones
+
+30 inscripciones distribuidas temporalmente entre septiembre y octubre 2024, simulando:
+- Estudiantes inscritos en múltiples cursos (cross-training)
+- Distribución equilibrada entre sedes
+- Fechas progresivas que permiten análisis temporal
+- Relaciones coherentes: estudiantes inscritos en cursos de su sede y nivel apropiado
+
+**Ejemplo:**
+```javascript
+{
+  _id: 1,
+  id_estudiante: 1,
+  id_sede: 1,
+  id_curso: 1,
+  fecha_inscripcion: new Date("2024-09-15")
+}
+```
+
+#### Datos de Reservas de Instrumentos
+
+12 reservas con características realistas:
+- Ventanas de 2 horas típicamente (práctica estándar)
+- Fechas recientes (octubre 2024)
+- Estudiantes reservando instrumentos de su sede
+- Horarios variados (mañana, tarde, noche)
+
+**Ejemplo:**
+```javascript
+{
+  _id: 1,
+  id_instrumento: 3,
+  id_estudiante: 2,
+  fecha_rese: new Date("2024-10-20T14:00:00"),
+  fecha_finrese: new Date("2024-10-20T16:00:00")
+}
+```
+
+#### Coherencia Referencial
+
+Se garantizó integridad referencial manual (MongoDB no tiene foreign keys automáticas):
+- Todos los usuario_id en profesores/estudiantes existen en usuarios
+- Todos los rol_id en usuarios existen en roles
+- Todos los id_sede en todas las colecciones existen en sedes
+- Todos los profesor_id en cursos existen en profesores
+- Todas las inscripciones vinculan estudiantes, cursos y sedes existentes
+- Todas las reservas vinculan instrumentos y estudiantes existentes
+
+---
+
+### Creación de Roles
+
+#### Arquitectura de Seguridad
+
+El sistema de seguridad de Campus Music implementa un modelo de control de acceso basado en roles (RBAC - Role-Based Access Control) aprovechando las capacidades nativas de MongoDB. Este enfoque permite definir permisos granulares a nivel de colección y operación, garantizando que cada tipo de usuario acceda únicamente a la información y funcionalidades apropiadas para su rol organizacional.
+
+La estrategia de seguridad se estructura en cuatro roles principales que reflejan la jerarquía operativa de Campus Music: Administrador del sistema con acceso total, Empleados de sede con permisos locales limitados, Profesores con acceso a información de sus cursos y estudiantes, y Estudiantes con permisos de consulta y autogestión de reservas.
+
+#### Principios de Diseño de Permisos
+
+1. **Principio de Menor Privilegio:** Cada rol tiene únicamente los permisos estrictamente necesarios para sus funciones
+2. **Separación de Responsabilidades:** Los empleados de sede no pueden modificar datos de otras sedes
+3. **Auditoría y Trazabilidad:** Todos los usuarios se identifican mediante usuarios nominales, no genéricos
+4. **Protección de Datos Sensibles:** Estudiantes solo pueden acceder a su propia información personal
+5. **Operaciones Controladas:** Las escrituras críticas (inscripciones, reservas) requieren roles específicos
+
+---
+
+#### Rol 1: Administrador del Sistema
+
+**Nombre del Rol:** `administrador_sistema`
+
+**Propósito:** Gestión completa del sistema con capacidades administrativas sin restricciones.
+
+**Permisos Otorgados:**
+
+```javascript
+db.createRole({
+  role: "administrador_sistema",
+  privileges: [
+    {
+      resource: { db: "sistema_musical", collection: "" },
+      actions: [
+        "find", "insert", "update", "remove",
+        "createCollection", "dropCollection",
+        "createIndex", "dropIndex", "listIndexes",
+        "collStats", "dbStats"
+      ]
+    }
+  ],
+  roles: []
+});
+```
+
+**Capacidades:**
+- **Lectura/Escritura Total:** Acceso sin restricciones a todas las colecciones
+- **Gestión de Estructura:** Puede crear/eliminar colecciones e índices
+- **Operaciones DDL:** Modificación de esquemas y estructura de base de datos
+- **Análisis de Rendimiento:** Acceso a estadísticas de colecciones y base de datos
+
+**Casos de Uso:**
+- Creación de nuevas sedes y configuración inicial
+- Gestión del catálogo de instrumentos
+- Creación de usuarios del sistema
+- Mantenimiento y optimización de índices
+- Generación de reportes ejecutivos globales
+
+**Ejemplo de Creación de Usuario Administrador:**
+
+```javascript
+db.createUser({
+  user: "admin_carlos",
+  pwd: "Admin123!Seguro",
+  roles: [
+    { role: "administrador_sistema", db: "sistema_musical" }
+  ],
+  customData: {
+    nombre_completo: "Carlos Méndez",
+    tipo_usuario: "Administrador",
+    email: "carlos.mendez@campusmusic.com"
+  }
+});
+```
+
+---
+
+#### Rol 2: Empleado de Sede
+
+**Nombre del Rol:** `empleado_sede`
+
+**Propósito:** Gestión operativa limitada a una sede específica, sin acceso a información de otras ubicaciones.
+
+**Permisos Otorgados:**
+
+```javascript
+db.createRole({
+  role: "empleado_sede",
+  privileges: [
+    // Lectura de estudiantes (filtrado por sede en aplicación)
+    {
+      resource: { db: "sistema_musical", collection: "estudiantes" },
+      actions: ["find"]
+    },
+    // Lectura de profesores
+    {
+      resource: { db: "sistema_musical", collection: "profesores" },
+      actions: ["find"]
+    },
+    // Lectura de cursos
+    {
+      resource: { db: "sistema_musical", collection: "cursos" },
+      actions: ["find"]
+    },
+    // Lectura de su sede
+    {
+      resource: { db: "sistema_musical", collection: "sedes" },
+      actions: ["find"]
+    },
+    // Gestión de instrumentos
+    {
+      resource: { db: "sistema_musical", collection: "instrumentos" },
+      actions: ["find", "update"]
+    },
+    // Gestión completa de inscripciones
+    {
+      resource: { db: "sistema_musical", collection: "inscripciones" },
+      actions: ["find", "insert", "update"]
+    },
+    // Gestión de reservas
+    {
+      resource: { db: "sistema_musical", collection: "reservas_instrumento" },
+      actions: ["find", "insert", "update", "remove"]
+    },
+    // Lectura de usuarios
+    {
+      resource: { db: "sistema_musical", collection: "usuarios" },
+      actions: ["find"]
+    },
+    // Lectura de roles
+    {
+      resource: { db: "sistema_musical", collection: "roles" },
+      actions: ["find"]
+    }
+  ],
+  roles: []
+});
+```
+
+**Capacidades:**
+- **Operaciones de Inscripción:** Registro de nuevos estudiantes en cursos
+- **Gestión de Reservas:** Control completo del préstamo de instrumentos
+- **Actualización de Instrumentos:** Cambio de estados (disponibilidad, mantenimiento)
+- **Consultas de Información:** Acceso a listas de estudiantes, profesores y cursos
+
+**Restricciones Implementadas:**
+- **Sin capacidad de eliminación (remove)** en la mayoría de colecciones, excepto reservas
+- **Filtrado a nivel de aplicación:** El código de aplicación debe agregar filtros por id_sede en todas las consultas
+- **Sin acceso a usuarios de otras sedes:** La aplicación valida que solo vean datos de su sede asignada
+
+**Casos de Uso:**
+- Inscribir estudiantes en cursos de la sede
+- Gestionar préstamos de instrumentos locales
+- Actualizar disponibilidad de instrumentos
+- Generar reportes locales de ocupación
+
+**Ejemplo de Creación de Usuario Empleado:**
+
+```javascript
+db.createUser({
+  user: "empleado_andrea",
+  pwd: "Empleado123!Bogota",
+  roles: [
+    { role: "empleado_sede", db: "sistema_musical" }
+  ],
+  customData: {
+    nombre_completo: "Andrea Torres",
+    tipo_usuario: "Empleado Sede",
+    email: "andrea.torres@campusmusic.com",
+    sede_id: 1, // Bogotá
+    sede_nombre: "Bogotá"
+  }
+});
+```
+
+**Nota Importante de Seguridad:**
+El campo `customData.sede_id` se utiliza en la capa de aplicación para filtrar automáticamente todas las consultas. MongoDB no aplica este filtrado automáticamente, por lo que es responsabilidad de la aplicación garantizar que los empleados solo vean datos de su sede asignada.
+
+---
+
+#### Rol 3: Profesor
+
+**Nombre del Rol:** `profesor_sistema`
+
+**Propósito:** Consulta de información relacionada con sus cursos asignados y estudiantes inscritos.
+
+**Permisos Otorgados:**
+
+```javascript
+db.createRole({
+  role: "profesor_sistema",
+  privileges: [
+    // Lectura de su información
+    {
+      resource: { db: "sistema_musical", collection: "profesores" },
+      actions: ["find"]
+    },
+    // Lectura de cursos
+    {
+      resource: { db: "sistema_musical", collection: "cursos" },
+      actions: ["find"]
+    },
+    // Lectura de inscripciones
+    {
+      resource: { db: "sistema_musical", collection: "inscripciones" },
+      actions: ["find"]
+    },
+    // Lectura de estudiantes
+    {
+      resource: { db: "sistema_musical", collection: "estudiantes" },
+      actions: ["find"]
+    },
+    // Lectura de usuarios
+    {
+      resource: { db: "sistema_musical", collection: "usuarios" },
+      actions: ["find"]
+    },
+    // Lectura de sedes
+    {
+      resource: { db: "sistema_musical", collection: "sedes" },
+      actions: ["find"]
+    },
+    // Lectura de instrumentos
+    {
+      resource: { db: "sistema_musical", collection: "instrumentos" },
+      actions: ["find"]
+    }
+  ],
+  roles: []
+});
+```
+
+**Capacidades:**
+- **Consulta de Cursos Asignados:** Ver detalles de los cursos que imparte
+- **Lista de Estudiantes:** Acceso a información de estudiantes inscritos en sus cursos
+- **Información de Sede:** Consultar datos de la sede donde trabaja
+- **Disponibilidad de Instrumentos:** Ver inventario para recomendar a estudiantes
+
+**Restricciones:**
+- **Solo lectura (find):** No puede modificar ningún dato del sistema
+- **Filtrado por profesor_id:** La aplicación debe filtrar cursos e inscripciones para mostrar solo los del profesor autenticado
+- **Sin acceso a datos financieros:** No puede ver costos de cursos ni ingresos
+
+**Casos de Uso:**
+- Ver lista de estudiantes en cada uno de sus cursos
+- Consultar horarios y ubicaciones de sus clases
+- Revisar información de contacto de estudiantes
+- Verificar disponibilidad de instrumentos para recomendar
+
+**Ejemplo de Creación de Usuario Profesor:**
+
+```javascript
+db.createUser({
+  user: "prof_sofia",
+  pwd: "Profesor123!Piano",
+  roles: [
+    { role: "profesor_sistema", db: "sistema_musical" }
+  ],
+  customData: {
+    nombre_completo: "Sofía Martínez",
+    tipo_usuario: "Profesor",
+    email: "sofia.martinez@campusmusic.com",
+    profesor_id: 1,
+    especialidad: "Piano",
+    sede_id: 1
+  }
+});
+```
+
+---
+
+#### Rol 4: Estudiante
+
+**Nombre del Rol:** `estudiante_sistema`
+
+**Propósito:** Autogestión de información personal, consulta de oferta académica y gestión de reservas de instrumentos.
+
+**Permisos Otorgados:**
+
+```javascript
+db.createRole({
+  role: "estudiante_sistema",
+  privileges: [
+    // Lectura de su información de estudiante
+    {
+      resource: { db: "sistema_musical", collection: "estudiantes" },
+      actions: ["find"]
+    },
+    // Lectura y actualización de su usuario
+    {
+      resource: { db: "sistema_musical", collection: "usuarios" },
+      actions: ["find", "update"]
+    },
+    // Consulta de cursos disponibles
+    {
+      resource: { db: "sistema_musical", collection: "cursos" },
+      actions: ["find"]
+    },
+    // Consulta de sedes
+    {
+      resource: { db: "sistema_musical", collection: "sedes" },
+      actions: ["find"]
+    },
+    // Consulta de profesores
+    {
+      resource: { db: "sistema_musical", collection: "profesores" },
+      actions: ["find"]
+    },
+    // Consulta de inscripciones
+    {
+      resource: { db: "sistema_musical", collection: "inscripciones" },
+      actions: ["find"]
+    },
+    // Gestión de reservas
+    {
+      resource: { db: "sistema_musical", collection: "reservas_instrumento" },
+      actions: ["find", "insert", "remove"]
+    },
+    // Consulta de instrumentos
+    {
+      resource: { db: "sistema_musical", collection: "instrumentos" },
+      actions: ["find"]
+    }
+  ],
+  roles: []
+});
+```
+
+**Capacidades:**
+- **Actualización de Perfil:** Puede modificar sus datos de contacto y dirección
+- **Consulta de Catálogo:** Ver todos los cursos disponibles en todas las sedes
+- **Gestión de Reservas:** Crear y cancelar reservas de instrumentos
+- **Historial Académico:** Consultar sus inscripciones pasadas y actuales
+- **Búsqueda de Profesores:** Ver información pública de docentes
+
+**Restricciones:**
+- **Sin capacidad de inscripción directa:** Debe ser registrado por empleado de sede
+- **Reservas limitadas:** Solo puede eliminar (cancelar) sus propias reservas, validado por aplicación
+- **Datos propios únicamente:** La aplicación filtra por id_estudiante en todas las consultas personales
+- **Sin acceso a datos financieros:** No ve costos hasta formalizar inscripción
+
+**Casos de Uso:**
+- Explorar catálogo de cursos y filtrar por instrumento/nivel
+- Reservar instrumentos para práctica personal
+- Consultar horarios de sus clases inscritas
+- Actualizar información de contacto
+- Cancelar reservas de instrumentos
+
+**Ejemplo de Creación de Usuario Estudiante:**
+
+```javascript
+db.createUser({
+  user: "est_maria",
+  pwd: "Estudiante123!",
+  roles: [
+    { role: "estudiante_sistema", db: "sistema_musical" }
+  ],
+  customData: {
+    nombre_completo: "María Fernanda Díaz",
+    tipo_usuario: "Estudiante",
+    email: "maria.diaz@estudiante.com",
+    estudiante_id: 1,
+    nivel_musical: "Principiante",
+    sede_id: 1
+  }
+});
+```
+
+---
+
+#### Matriz de Permisos
+
+| Colección | Administrador | Empleado Sede | Profesor | Estudiante |
+|-----------|--------------|---------------|----------|------------|
+| roles | CRUD + DDL | R | - | - |
+| usuarios | CRUD + DDL | R | R | R + U (propio) |
+| sedes | CRUD + DDL | R | R | R |
+| estudiantes | CRUD + DDL | R | R | R (propio) |
+| profesores | CRUD + DDL | R | R (propio) | R |
+| cursos | CRUD + DDL | R | R | R |
+| instrumentos | CRUD + DDL | R + U | R | R |
+| inscripciones | CRUD + DDL | R + C + U | R | R (propias) |
+| reservas_instrumento | CRUD + DDL | CRUD | R | R + C + D (propias) |
+
+**Leyenda:**
+- **C:** Create (insert)
+- **R:** Read (find)
+- **U:** Update
+- **D:** Delete (remove)
+- **DDL:** Operaciones de definición (createCollection, createIndex, etc.)
+
+---
+
+#### Verificación de Roles
+
+Para verificar que los roles se crearon correctamente:
+
+```javascript
+// Listar roles personalizados
+db.getRoles({ showBuiltinRoles: false });
+
+// Ver usuarios del sistema
+db.getUsers();
+
+// Ver permisos específicos de un rol
+db.getRole("estudiante_sistema", { showPrivileges: true });
+```
+
+---
+
+#### Consideraciones de Seguridad Adicionales
+
+1. **Autenticación Obligatoria:**
+```javascript
+// En el archivo mongod.conf
+security:
+  authorization: enabled
+```
+
+2. **Conexión con Usuario Específico:**
+```bash
+mongosh -u "est_maria" -p "Estudiante123!" --authenticationDatabase "sistema_musical"
+```
+
+3. **Filtrado a Nivel de Aplicación:**
+La capa de aplicación debe implementar middleware que agregue automáticamente filtros basados en el `customData` del usuario:
+
+```javascript
+// Ejemplo en Node.js
+function getSedeFilter(req) {
+  if (req.user.tipo_usuario === "Empleado Sede") {
+    return { id_sede: req.user.sede_id };
+  }
+  return {};
+}
+
+// Uso en query
+const estudiantes = await db.collection('estudiantes')
+  .find({ ...getSedeFilter(req) })
+  .toArray();
+```
+
+4. **Auditoría de Operaciones:**
+MongoDB Enterprise ofrece auditoría nativa. En Community Edition, implementar logging a nivel de aplicación:
+
+```javascript
+// Log de operaciones críticas
+logger.info({
+  usuario: req.user.username,
+  operacion: 'insertar_inscripcion',
+  documento: inscripcionData,
+  timestamp: new Date()
+});
+```
+
+---
+
+#### Buenas Prácticas Implementadas
+
+✅ **Separación de privilegios** según función organizacional
+✅ **Principio de menor privilegio** estrictamente aplicado
+✅ **Contraseñas complejas** con requisitos mínimos de seguridad
+✅ **Metadata descriptiva** en customData para trazabilidad
+✅ **Roles granulares** a nivel de colección y operación
+✅ **Sin usuarios genéricos** - todos nominales para auditoría
+✅ **Validación multinivel** - base de datos + aplicación
+✅ **Documentación exhaustiva** de cada rol y sus capacidades
+
+
+
 
 ---
 
