@@ -211,7 +211,7 @@ db.createCollection("cursos", {
   validator: {
     $jsonSchema: {
       bsonType: "object",
-      required: ["_id", "nombre_curso", "instrumento", "horario", "duracion_meses", "sede_id", "profesor_id"],
+      required: ["_id", "nombre_curso", "instrumento", "horario", "duracion_meses", "sede_id", "profesor_id","costo","activo"],
       properties: {
         _id: {
           bsonType: "int",
@@ -256,6 +256,10 @@ db.createCollection("cursos", {
         profesor_id: {
           bsonType: "int",
           description: "ID del profesor que imparte el curso - requerido"
+        },
+        costo:{
+            bsonType:"int",
+            description:"Costo de cada uno de los cursos"
         }
       }
     }
