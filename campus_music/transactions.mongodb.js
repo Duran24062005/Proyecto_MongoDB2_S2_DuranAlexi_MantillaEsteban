@@ -113,7 +113,7 @@ async function InscribirEstudianteConTransaccion(
         
     } catch (error) {
         // ============= Paso 9: Manejo de errores =============
-        console.log(`   Error: ${error.message}\n`);
+        console.log(`Error: ${error.message}\n`);
 
         // Abortar la transacción (rollback)
         await session.abortTransaction();
