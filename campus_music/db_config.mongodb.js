@@ -260,6 +260,10 @@ db.createCollection("cursos", {
         costo:{
             bsonType:"int",
             description:"Costo de cada uno de los cursos"
+        },
+        activo:{
+            bsonType:"bool",
+            description:"si el curso esta activo o no"
         }
       }
     }

@@ -288,6 +288,45 @@ db.inscripciones.aggregate([
 
 // 7. Listar los **cursos actualmente en ejecución** en cada sede.
 
+db.cursos.aggregate([
+  {
+    $match: { activo: true } 
+  },
+  {
+    $lookup: {
+      from: "sedes",
+      localField: "sede_id",
+      foreignField: "_id",
+      as: "sede_info"
+    }
+  },
+  { 
+    $unwind: "$sede_info" 
+  },
+
+  {
+    $group: {
+      _id: "$sede_info.nombre_sede",
+      cursos_en_ejecucion: {
+        $push: {
+          nombre_curso: "$nombre_curso",
+          instrumento: "$instrumento",
+          nivel: "$nivel",
+          duracion_meses: "$duracion_meses",
+          costo: "$costo",
+          profesor_id: "$profesor_id"
+        }
+      }
+    }
+  },
+  {
+    $project: {
+      _id: 0,
+      nombre_sede: "$_id",
+      cursos_en_ejecucion: 1
+    }
+  }
+]);
 
 
 // 8. Detectar cursos que **excedieron el cupo** permitido en algún momento.

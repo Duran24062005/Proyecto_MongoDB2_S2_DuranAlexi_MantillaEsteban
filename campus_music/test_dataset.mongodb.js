@@ -368,7 +368,8 @@ db.cursos.insertMany([
     nivel: "Principiante",
     costo: 150000,
     sede_id: 1,
-    profesor_id: 1
+    profesor_id: 1,
+    activo: true
   },
   {
     _id: 2,
@@ -380,7 +381,8 @@ db.cursos.insertMany([
     nivel: "Intermedio",
     costo: 200000,
     sede_id: 1,
-    profesor_id: 2
+    profesor_id: 2,
+    activo: true
   },
   {
     _id: 3,
@@ -392,7 +394,8 @@ db.cursos.insertMany([
     nivel: "Avanzado",
     costo: 250000,
     sede_id: 1,
-    profesor_id: 3
+    profesor_id: 3,
+    activo: true
   },
   {
     _id: 4,
@@ -404,7 +407,8 @@ db.cursos.insertMany([
     nivel: "Principiante",
     costo: 150000,
     sede_id: 1,
-    profesor_id: 4
+    profesor_id: 4,
+    activo: true
   },
   {
     _id: 5,
@@ -416,7 +420,8 @@ db.cursos.insertMany([
     nivel: "Profesional",
     costo: 300000,
     sede_id: 1,
-    profesor_id: 5
+    profesor_id: 5,
+    activo: true
   },
 
   // === SEDE 2: Medellín ===
@@ -430,7 +435,8 @@ db.cursos.insertMany([
     nivel: "Principiante",
     costo: 150000,
     sede_id: 2,
-    profesor_id: 6
+    profesor_id: 6,
+    activo: true
   },
   {
     _id: 7,
@@ -442,7 +448,8 @@ db.cursos.insertMany([
     nivel: "Intermedio",
     costo: 200000,
     sede_id: 2,
-    profesor_id: 7
+    profesor_id: 7,
+    activo: true
   },
   {
     _id: 8,
@@ -454,7 +461,8 @@ db.cursos.insertMany([
     nivel: "Profesional",
     costo: 300000,
     sede_id: 2,
-    profesor_id: 8
+    profesor_id: 8,
+    activo: true
   },
   {
     _id: 9,
@@ -466,7 +474,8 @@ db.cursos.insertMany([
     nivel: "Intermedio",
     costo: 200000,
     sede_id: 2,
-    profesor_id: 9
+    profesor_id: 9,
+    activo: true
   },
   {
     _id: 10,
@@ -478,7 +487,8 @@ db.cursos.insertMany([
     nivel: "Avanzado",
     costo: 250000,
     sede_id: 2,
-    profesor_id: 10
+    profesor_id: 10,
+    activo: true
   },
 
   // === SEDE 3: Cali ===
@@ -492,7 +502,8 @@ db.cursos.insertMany([
     nivel: "Principiante",
     costo: 150000,
     sede_id: 3,
-    profesor_id: 11
+    profesor_id: 11,
+    activo: true
   },
   {
     _id: 12,
@@ -504,7 +515,8 @@ db.cursos.insertMany([
     nivel: "Intermedio",
     costo: 200000,
     sede_id: 3,
-    profesor_id: 12
+    profesor_id: 12,
+    activo: true
   },
   {
     _id: 13,
@@ -516,7 +528,8 @@ db.cursos.insertMany([
     nivel: "Avanzado",
     costo: 250000,
     sede_id: 3,
-    profesor_id: 13
+    profesor_id: 13,
+    activo: true
   },
   {
     _id: 14,
@@ -528,7 +541,8 @@ db.cursos.insertMany([
     nivel: "Profesional",
     costo: 300000,
     sede_id: 3,
-    profesor_id: 14
+    profesor_id: 14,
+    activo: true
   },
   {
     _id: 15,
@@ -540,7 +554,8 @@ db.cursos.insertMany([
     nivel: "Avanzado",
     costo: 250000,
     sede_id: 3,
-    profesor_id: 15
+    profesor_id: 15,
+    activo: true
   },
 
   // === SEDE 4: Barranquilla ===
@@ -554,7 +569,8 @@ db.cursos.insertMany([
     nivel: "Principiante",
     costo: 150000,
     sede_id: 4,
-    profesor_id: 16
+    profesor_id: 16,
+    activo: true
   },
   {
     _id: 17,
@@ -566,7 +582,8 @@ db.cursos.insertMany([
     nivel: "Intermedio",
     costo: 200000,
     sede_id: 4,
-    profesor_id: 17
+    profesor_id: 17,
+    activo: true
   },
   {
     _id: 18,
@@ -578,7 +595,8 @@ db.cursos.insertMany([
     nivel: "Avanzado",
     costo: 250000,
     sede_id: 4,
-    profesor_id: 18
+    profesor_id: 18,
+    activo: true
   },
   {
     _id: 19,
@@ -590,7 +608,8 @@ db.cursos.insertMany([
     nivel: "Profesional",
     costo: 300000,
     sede_id: 4,
-    profesor_id: 19
+    profesor_id: 19,
+    activo: true
   },
   {
     _id: 20,
@@ -602,9 +621,11 @@ db.cursos.insertMany([
     nivel: "Avanzado",
     costo: 250000,
     sede_id: 4,
-    profesor_id: 20
+    profesor_id: 20,
+    activo: true
   }
 ]);
+
 
 
 
