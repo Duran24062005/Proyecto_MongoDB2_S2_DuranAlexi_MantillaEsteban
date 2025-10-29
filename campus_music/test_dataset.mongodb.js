@@ -312,63 +312,28 @@ db.usuarios.insertMany([
 
 // ==================== 4. PROFESORES ====================
 db.profesores.insertMany([
-  {
-    _id: 1,
-    usuario_id: 5,
-    especialidad: "Piano",
-    experiencia_anios: 12,
-    id_sede: 1
-  },
-  {
-    _id: 2,
-    usuario_id: 6,
-    especialidad: "Guitarra",
-    experiencia_anios: 8,
-    id_sede: 2
-  },
-  {
-    _id: 3,
-    usuario_id: 7,
-    especialidad: "Violín",
-    experiencia_anios: 15,
-    id_sede: 3
-  },
-  {
-    _id: 4,
-    usuario_id: 8,
-    especialidad: "Batería",
-    experiencia_anios: 6,
-    id_sede: 4
-  },
-  {
-    _id: 5,
-    usuario_id: 9,
-    especialidad: "Canto",
-    experiencia_anios: 10,
-    id_sede: 1
-  },
-  {
-    _id: 6,
-    usuario_id: 10,
-    especialidad: "Bajo",
-    experiencia_anios: 7,
-    id_sede: 2
-  },
-  {
-    _id: 7,
-    usuario_id: 11,
-    especialidad: "Saxofón",
-    experiencia_anios: 9,
-    id_sede: 3
-  },
-  {
-    _id: 8,
-    usuario_id: 12,
-    especialidad: "Flauta",
-    experiencia_anios: 11,
-    id_sede: 4
-  }
+  { _id: 1, usuario_id: 21, especialidad: "Piano", experiencia_anios: 3, id_sede: 1 },
+  { _id: 2, usuario_id: 22, especialidad: "Guitarra", experiencia_anios: 5, id_sede: 1 },
+  { _id: 3, usuario_id: 23, especialidad: "Violín", experiencia_anios: 7, id_sede: 1 },
+  { _id: 4, usuario_id: 24, especialidad: "Batería", experiencia_anios: 4, id_sede: 1 },
+  { _id: 5, usuario_id: 25, especialidad: "Canto", experiencia_anios: 6, id_sede: 1 },
+  { _id: 6, usuario_id: 26, especialidad: "Piano", experiencia_anios: 4, id_sede: 2 },
+  { _id: 7, usuario_id: 27, especialidad: "Guitarra", experiencia_anios: 8, id_sede: 2 },
+  { _id: 8, usuario_id: 28, especialidad: "Percusión", experiencia_anios: 3, id_sede: 2 },
+  { _id: 9, usuario_id: 29, especialidad: "Teclado", experiencia_anios: 5, id_sede: 2 },
+  { _id: 10, usuario_id: 30, especialidad: "Canto", experiencia_anios: 2, id_sede: 2 },
+  { _id: 11, usuario_id: 31, especialidad: "Violín", experiencia_anios: 6, id_sede: 3 },
+  { _id: 12, usuario_id: 32, especialidad: "Bajo", experiencia_anios: 4, id_sede: 3 },
+  { _id: 13, usuario_id: 33, especialidad: "Canto", experiencia_anios: 7, id_sede: 3 },
+  { _id: 14, usuario_id: 34, especialidad: "Guitarra", experiencia_anios: 5, id_sede: 3 },
+  { _id: 15, usuario_id: 35, especialidad: "Piano", experiencia_anios: 9, id_sede: 3 },
+  { _id: 16, usuario_id: 36, especialidad: "Batería", experiencia_anios: 5, id_sede: 4 },
+  { _id: 17, usuario_id: 37, especialidad: "Guitarra", experiencia_anios: 10, id_sede: 4 },
+  { _id: 18, usuario_id: 38, especialidad: "Teclado", experiencia_anios: 6, id_sede: 4 },
+  { _id: 19, usuario_id: 39, especialidad: "Percusión", experiencia_anios: 4, id_sede: 4 },
+  { _id: 20, usuario_id: 40, especialidad: "Canto", experiencia_anios: 3, id_sede: 4 }
 ]);
+
 
 // ==================== 5. ESTUDIANTES ====================
 db.estudiantes.insertMany([
@@ -392,143 +357,277 @@ db.estudiantes.insertMany([
 
 // ==================== 6. CURSOS ====================
 db.cursos.insertMany([
-  // Sede Bogotá
+  // === SEDE 1: Bogotá ===
   {
     _id: 1,
-    nombre_curso: "Piano Clásico para Principiantes",
+    nombre_curso: "Piano Básico",
     instrumento: "Piano",
-    horario: "Lunes y Miércoles 2:00-4:00 PM",
+    horario: "Lunes y Miércoles 3-5pm",
     cupos: 10,
-    duracion_meses: 6,
+    duracion_meses: 3,
     nivel: "Principiante",
+    costo: 150000,
     sede_id: 1,
-    profesor_id: 1
+    profesor_id: 1,
+    activo: true
   },
   {
     _id: 2,
-    nombre_curso: "Piano Jazz Intermedio",
-    instrumento: "Piano",
-    horario: "Martes y Jueves 3:00-5:00 PM",
-    cupos: 8,
-    duracion_meses: 8,
+    nombre_curso: "Guitarra Intermedia",
+    instrumento: "Guitarra",
+    horario: "Martes y Jueves 2-4pm",
+    cupos: 12,
+    duracion_meses: 4,
     nivel: "Intermedio",
+    costo: 200000,
     sede_id: 1,
-    profesor_id: 1
+    profesor_id: 2,
+    activo: true
   },
   {
     _id: 3,
-    nombre_curso: "Canto Lírico Avanzado",
+    nombre_curso: "Canto Avanzado",
     instrumento: "Voz",
-    horario: "Viernes 4:00-6:00 PM",
-    cupos: 6,
-    duracion_meses: 10,
+    horario: "Viernes 9-12pm",
+    cupos: 8,
+    duracion_meses: 5,
     nivel: "Avanzado",
+    costo: 250000,
     sede_id: 1,
-    profesor_id: 5
+    profesor_id: 3,
+    activo: true
   },
-  // Sede Medellín
   {
     _id: 4,
-    nombre_curso: "Guitarra Acústica Básica",
-    instrumento: "Guitarra",
-    horario: "Lunes y Miércoles 10:00-12:00 AM",
-    cupos: 12,
-    duracion_meses: 5,
+    nombre_curso: "Batería Principiante",
+    instrumento: "Batería",
+    horario: "Martes y Jueves 10-12pm",
+    cupos: 10,
+    duracion_meses: 3,
     nivel: "Principiante",
-    sede_id: 2,
-    profesor_id: 2
+    costo: 150000,
+    sede_id: 1,
+    profesor_id: 4,
+    activo: true
   },
   {
     _id: 5,
-    nombre_curso: "Guitarra Eléctrica Avanzada",
-    instrumento: "Guitarra",
-    horario: "Martes y Jueves 5:00-7:00 PM",
-    cupos: 8,
-    duracion_meses: 12,
-    nivel: "Avanzado",
-    sede_id: 2,
-    profesor_id: 2
+    nombre_curso: "Violín Profesional",
+    instrumento: "Violín",
+    horario: "Sábados 8-12pm",
+    cupos: 6,
+    duracion_meses: 6,
+    nivel: "Profesional",
+    costo: 300000,
+    sede_id: 1,
+    profesor_id: 5,
+    activo: true
   },
+
+  // === SEDE 2: Medellín ===
   {
     _id: 6,
-    nombre_curso: "Bajo Eléctrico Intermedio",
-    instrumento: "Bajo",
-    horario: "Sábados 9:00-11:00 AM",
+    nombre_curso: "Guitarra Básica",
+    instrumento: "Guitarra",
+    horario: "Lunes y Miércoles 4-6pm",
     cupos: 10,
-    duracion_meses: 6,
-    nivel: "Intermedio",
+    duracion_meses: 3,
+    nivel: "Principiante",
+    costo: 150000,
     sede_id: 2,
-    profesor_id: 6
+    profesor_id: 6,
+    activo: true
   },
-  // Sede Cali
   {
     _id: 7,
-    nombre_curso: "Violín Clásico Principiantes",
-    instrumento: "Violín",
-    horario: "Lunes, Miércoles y Viernes 2:00-4:00 PM",
-    cupos: 8,
-    duracion_meses: 8,
-    nivel: "Principiante",
-    sede_id: 3,
-    profesor_id: 3
+    nombre_curso: "Bajo Intermedio",
+    instrumento: "Bajo",
+    horario: "Martes y Jueves 2-5pm",
+    cupos: 10,
+    duracion_meses: 4,
+    nivel: "Intermedio",
+    costo: 200000,
+    sede_id: 2,
+    profesor_id: 7,
+    activo: true
   },
   {
     _id: 8,
-    nombre_curso: "Violín Avanzado Repertorio",
-    instrumento: "Violín",
-    horario: "Martes y Jueves 4:00-6:00 PM",
+    nombre_curso: "Canto Profesional",
+    instrumento: "Voz",
+    horario: "Viernes 10-1pm",
     cupos: 6,
-    duracion_meses: 10,
-    nivel: "Avanzado",
-    sede_id: 3,
-    profesor_id: 3
+    duracion_meses: 6,
+    nivel: "Profesional",
+    costo: 300000,
+    sede_id: 2,
+    profesor_id: 8,
+    activo: true
   },
   {
     _id: 9,
-    nombre_curso: "Saxofón Jazz",
-    instrumento: "Saxofón",
-    horario: "Sábados 10:00-12:00 PM",
-    cupos: 7,
-    duracion_meses: 9,
+    nombre_curso: "Piano Intermedio",
+    instrumento: "Piano",
+    horario: "Martes y Jueves 8-10am",
+    cupos: 12,
+    duracion_meses: 4,
     nivel: "Intermedio",
-    sede_id: 3,
-    profesor_id: 7
+    costo: 200000,
+    sede_id: 2,
+    profesor_id: 9,
+    activo: true
   },
-  // Sede Barranquilla
   {
     _id: 10,
-    nombre_curso: "Batería Rock Principiantes",
-    instrumento: "Batería",
-    horario: "Lunes y Miércoles 6:00-8:00 PM",
-    cupos: 5,
-    duracion_meses: 6,
-    nivel: "Principiante",
-    sede_id: 4,
-    profesor_id: 4
+    nombre_curso: "Percusión Avanzada",
+    instrumento: "Percusión",
+    horario: "Sábados 2-6pm",
+    cupos: 8,
+    duracion_meses: 5,
+    nivel: "Avanzado",
+    costo: 250000,
+    sede_id: 2,
+    profesor_id: 10,
+    activo: true
   },
+
+  // === SEDE 3: Cali ===
   {
     _id: 11,
-    nombre_curso: "Batería Técnicas Avanzadas",
-    instrumento: "Batería",
-    horario: "Martes y Jueves 6:00-8:00 PM",
-    cupos: 5,
-    duracion_meses: 10,
-    nivel: "Avanzado",
-    sede_id: 4,
-    profesor_id: 4
+    nombre_curso: "Violín Básico",
+    instrumento: "Violín",
+    horario: "Lunes y Miércoles 2-4pm",
+    cupos: 10,
+    duracion_meses: 3,
+    nivel: "Principiante",
+    costo: 150000,
+    sede_id: 3,
+    profesor_id: 11,
+    activo: true
   },
   {
     _id: 12,
-    nombre_curso: "Flauta Dulce Iniciación",
-    instrumento: "Flauta",
-    horario: "Sábados 2:00-4:00 PM",
+    nombre_curso: "Saxofón Intermedio",
+    instrumento: "Saxofón",
+    horario: "Martes y Jueves 3-5pm",
     cupos: 12,
     duracion_meses: 4,
+    nivel: "Intermedio",
+    costo: 200000,
+    sede_id: 3,
+    profesor_id: 12,
+    activo: true
+  },
+  {
+    _id: 13,
+    nombre_curso: "Canto Avanzado Cali",
+    instrumento: "Voz",
+    horario: "Viernes 8-11am",
+    cupos: 8,
+    duracion_meses: 5,
+    nivel: "Avanzado",
+    costo: 250000,
+    sede_id: 3,
+    profesor_id: 13,
+    activo: true
+  },
+  {
+    _id: 14,
+    nombre_curso: "Piano Profesional Cali",
+    instrumento: "Piano",
+    horario: "Sábados 9-1pm",
+    cupos: 6,
+    duracion_meses: 6,
+    nivel: "Profesional",
+    costo: 300000,
+    sede_id: 3,
+    profesor_id: 14,
+    activo: true
+  },
+  {
+    _id: 15,
+    nombre_curso: "Guitarra Avanzada Cali",
+    instrumento: "Guitarra",
+    horario: "Martes y Jueves 6-8pm",
+    cupos: 10,
+    duracion_meses: 4,
+    nivel: "Avanzado",
+    costo: 250000,
+    sede_id: 3,
+    profesor_id: 15,
+    activo: true
+  },
+
+  // === SEDE 4: Barranquilla ===
+  {
+    _id: 16,
+    nombre_curso: "Batería Básica",
+    instrumento: "Batería",
+    horario: "Lunes y Miércoles 10-12pm",
+    cupos: 10,
+    duracion_meses: 3,
     nivel: "Principiante",
+    costo: 150000,
     sede_id: 4,
-    profesor_id: 8
+    profesor_id: 16,
+    activo: true
+  },
+  {
+    _id: 17,
+    nombre_curso: "Piano Intermedio Barranquilla",
+    instrumento: "Piano",
+    horario: "Martes y Jueves 1-3pm",
+    cupos: 12,
+    duracion_meses: 4,
+    nivel: "Intermedio",
+    costo: 200000,
+    sede_id: 4,
+    profesor_id: 17,
+    activo: true
+  },
+  {
+    _id: 18,
+    nombre_curso: "Violín Avanzado Barranquilla",
+    instrumento: "Violín",
+    horario: "Viernes 3-6pm",
+    cupos: 8,
+    duracion_meses: 5,
+    nivel: "Avanzado",
+    costo: 250000,
+    sede_id: 4,
+    profesor_id: 18,
+    activo: true
+  },
+  {
+    _id: 19,
+    nombre_curso: "Canto Profesional Barranquilla",
+    instrumento: "Voz",
+    horario: "Sábados 8-12pm",
+    cupos: 6,
+    duracion_meses: 6,
+    nivel: "Profesional",
+    costo: 300000,
+    sede_id: 4,
+    profesor_id: 19,
+    activo: true
+  },
+  {
+    _id: 20,
+    nombre_curso: "Guitarra Avanzada Barranquilla",
+    instrumento: "Guitarra",
+    horario: "Martes y Jueves 6-8pm",
+    cupos: 10,
+    duracion_meses: 4,
+    nivel: "Avanzado",
+    costo: 250000,
+    sede_id: 4,
+    profesor_id: 20,
+    activo: true
   }
 ]);
+
+
+
 
 // ==================== 7. INSTRUMENTOS ====================
 db.instrumentos.insertMany([
