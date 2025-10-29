@@ -237,7 +237,13 @@ Introducción al proyecto
    - [Primera Forma Normal (1FN)](#primera-forma-normal-1fn)
    - [Segunda Forma Normal (2FN)](#segunda-forma-normal-2fn)
    - [Tercera Forma Normal (3FN)](#tercera-forma-normal-3fn)
-7. [Referencias](#referencias)
+7. [Construcción del Modelo Fisico](#construcción-del-modelo-fisico)
+   - [Creación de los Json Schema e Indices](#Creación-de-los-json-schema-e-indices)
+   - [Poblado de las Colecciones](#pobladode-las-colecciones)
+   - [Creación de Roles](#creación-de-roles)
+   - [Agregaciones - Aggregations](#gregaciones---aggregations)
+   - [Transaciones - Transactions](#transaciones---transactions)
+8. [Referencias](#referencias)
 
 ---
 
@@ -940,6 +946,21 @@ La Tercera Forma Normal requiere que la tabla esté en Segunda Forma Normal y qu
 El modelo en general cumple con la Tercera Forma Normal porque la mayoría de los atributos en cada tabla dependen directamente de la clave primaria sin intermediarios. En **Usuarios**, todos los campos como `nombre_usuario`, `documento`, `contacto`, `email` y `direccion` describen directamente al usuario identificado por `_id`, sin que ninguno dependa de otro atributo no clave. En **Cursos**, aunque hay múltiples claves foráneas como `sede_id` y `profesor_id`, los atributos descriptivos como `nombre_curso`, `instrumento`, `horario`, `cupos`, `duracion` y `nivel` dependen del identificador del curso mismo, no de la sede o del profesor. Las tablas especializadas como **Estudiantes** y **Profesores** mantienen solo atributos inherentes a esas entidades, con las claves foráneas sirviendo únicamente como referencias relacionales sin crear dependencias transitivas de datos descriptivos.
 
 Sin embargo, existe un área potencial de mejora en la tabla **Sedes** con el campo `n_estudiantes`, que técnicamente representa un valor calculado o derivado que podría obtenerse contando los registros de **Estudiantes** con ese `id_sede`. Esta situación constituye una desnormalización intencional que, aunque no viola estrictamente la 3FN si se considera un campo mantenido por triggers, introduce el riesgo de inconsistencias si los mecanismos de actualización automática fallan. Una alternativa sería eliminar `n_estudiantes` y calcularlo dinámicamente mediante consultas o vistas, o si el rendimiento es crítico, mantenerlo como está pero con documentación explícita y triggers robustos. Adicionalmente, debería evaluarse si `cursos_disponibles` en **Sedes** es un campo calculado o lista derivada de la tabla **Cursos**, porque en ese caso también representaría una desnormalización que requiere sincronización. Para garantizar total conformidad con 3FN, estos campos calculados deberían gestionarse mediante vistas materializadas o cachés de aplicación en lugar de columnas físicas en las tablas.
+
+---
+
+<div align="center">
+
+## Construcción del Modelo Fisico
+
+</div>
+
+
+### Creación de los *Json Schema* e *Indices*
+### Poblado de las *Colecciones*
+### Creación de *Roles*
+### Agregaciones - Aggregations
+### Transaciones - Transactions
 
 ---
 
